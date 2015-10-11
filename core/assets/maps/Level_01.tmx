@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="36" height="18" tilewidth="16" tileheight="16" nextobjectid="36">
+ <tileset firstgid="1" name="tileset" tilewidth="16" tileheight="16" tilecount="924">
+  <image source="tileset.png" width="528" height="448"/>
+ </tileset>
+ <layer name="Sky" width="36" height="18">
+  <data encoding="base64" compression="zlib">
+   eJztwzEJAAAMA7Ay/4bqrs9kJJBeUlVV/QOR4Nlo
+  </data>
+ </layer>
+ <layer name="Cloud" width="36" height="18">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgxVMZWJgmAbE05kQYg+A7IdM+NXgA3OB6uYB8Xwi1SODbUA924F4Bx69xKghBZDqP1oDavuPXuA+EyTtkANG44C2gNjwpSTvkgKGW/iOglEwCsgDAFWXGwg=
+  </data>
+ </layer>
+ <objectgroup name="Rocks">
+  <object id="1" gid="1" x="0" y="288" width="16" height="16"/>
+  <object id="2" gid="1" x="16" y="288" width="16" height="16"/>
+  <object id="3" gid="1" x="32" y="288" width="16" height="16"/>
+  <object id="4" gid="1" x="48" y="288" width="16" height="16"/>
+  <object id="5" gid="1" x="64" y="288" width="16" height="16"/>
+  <object id="6" gid="1" x="80" y="288" width="16" height="16"/>
+  <object id="7" gid="1" x="96" y="288" width="16" height="16"/>
+  <object id="8" gid="1" x="112" y="288" width="16" height="16"/>
+  <object id="9" gid="1" x="128" y="288" width="16" height="16"/>
+  <object id="10" gid="1" x="144" y="288" width="16" height="16"/>
+  <object id="11" gid="1" x="160" y="288" width="16" height="16"/>
+  <object id="12" gid="1" x="176" y="288" width="16" height="16"/>
+  <object id="13" gid="1" x="192" y="288" width="16" height="16"/>
+  <object id="14" gid="1" x="208" y="288" width="16" height="16"/>
+  <object id="15" gid="1" x="240" y="288" width="16" height="16"/>
+  <object id="16" gid="1" x="224" y="288" width="16" height="16"/>
+  <object id="17" gid="1" x="256" y="288" width="16" height="16"/>
+  <object id="18" gid="1" x="272" y="288" width="16" height="16"/>
+  <object id="19" gid="1" x="288" y="288" width="16" height="16"/>
+  <object id="20" gid="1" x="304" y="288" width="16" height="16"/>
+  <object id="21" gid="1" x="320" y="288" width="16" height="16"/>
+  <object id="22" gid="1" x="336" y="288" width="16" height="16"/>
+  <object id="23" gid="1" x="448" y="288" width="16" height="16"/>
+  <object id="24" gid="1" x="464" y="288" width="16" height="16"/>
+  <object id="25" gid="1" x="480" y="288" width="16" height="16"/>
+  <object id="26" gid="1" x="496" y="288" width="16" height="16"/>
+  <object id="27" gid="1" x="512" y="288" width="16" height="16"/>
+  <object id="28" gid="1" x="528" y="288" width="16" height="16"/>
+  <object id="29" gid="1" x="544" y="288" width="16" height="16"/>
+  <object id="30" gid="1" x="560" y="288" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="Bricks">
+  <object id="31" gid="2" x="112" y="224" width="16" height="16"/>
+  <object id="32" gid="2" x="128" y="224" width="16" height="16"/>
+  <object id="33" gid="2" x="144" y="224" width="16" height="16"/>
+  <object id="34" gid="2" x="160" y="224" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="Start">
+  <object id="35" gid="64" x="48" y="272" width="16" height="16"/>
+ </objectgroup>
+</map>
