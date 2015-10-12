@@ -92,6 +92,14 @@ public class PlayScreen implements Screen {
         return textureAtlas;
     }
 
+    public float getMapWidth() {
+        return mapWidth;
+    }
+
+    public float getMapHeight() {
+        return mapHeight;
+    }
+
     public void update(float delta) {
         accumulator += delta;
         if (accumulator > GameManager.STEP) {

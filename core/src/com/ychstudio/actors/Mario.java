@@ -102,7 +102,6 @@ public class Mario extends RigidBody {
             body.applyForceToCenter(new Vector2(36.0f, 0.0f), true);
         }
 
-
     }
 
     public Vector2 getPosition() {
@@ -158,6 +157,16 @@ public class Mario extends RigidBody {
         }
 
         stateTime = previousState == currentState ? stateTime + delta : 0;
+
+        if (body.getPosition().x < 0.5f) {
+            body.setTransform(0.5f, body.getPosition().y, 0);
+            body.setLinearVelocity(0, body.getLinearVelocity().y);
+        }
+        else if (body.getPosition().x > playScreen.getMapWidth() - 0.5f) {
+            body.setTransform(playScreen.getMapWidth() - 0.5f, body.getPosition().y, 0);
+            body.setLinearVelocity(0, body.getLinearVelocity().y);
+        }
+
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
 
     }

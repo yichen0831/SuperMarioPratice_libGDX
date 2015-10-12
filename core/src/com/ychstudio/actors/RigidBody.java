@@ -11,10 +11,12 @@ import com.ychstudio.screens.PlayScreen;
  * RigidBody
  */
 public abstract class RigidBody extends Sprite {
+    protected PlayScreen playScreen;
     protected World world;
     protected Body body;
 
     public RigidBody(PlayScreen playScreen, float x, float y) {
+        this.playScreen = playScreen;
         this.world = playScreen.world;
 
         setPosition(x, y);
