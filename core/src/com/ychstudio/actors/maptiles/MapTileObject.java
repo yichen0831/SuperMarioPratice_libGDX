@@ -1,6 +1,7 @@
-package com.ychstudio.actors;
+package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.ychstudio.actors.RigidBody;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 

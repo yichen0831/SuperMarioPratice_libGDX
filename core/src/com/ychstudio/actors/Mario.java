@@ -90,7 +90,7 @@ public class Mario extends RigidBody {
     }
 
     private void handleInput(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && canJump()) {
             body.applyLinearImpulse(new Vector2(0.0f, 20.0f), body.getLocalCenter(), true);
         }
 
@@ -107,6 +107,10 @@ public class Mario extends RigidBody {
 
     public Vector2 getPosition() {
         return body.getPosition();
+    }
+
+    private boolean canJump() {
+        return !(currentState == State.FALLING || currentState == State.JUMPING);
     }
 
     @Override

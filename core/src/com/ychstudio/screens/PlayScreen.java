@@ -4,19 +4,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ychstudio.SuperMario;
-import com.ychstudio.actors.MapTileObject;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.maptiles.MapTileObject;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.utils.WorldContactListener;
 import com.ychstudio.utils.WorldCreator;
@@ -40,6 +41,9 @@ public class PlayScreen implements Screen {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer mapRenderer;
 
+    private float mapWidth;
+    private float mapHeight;
+
     private TextureAtlas textureAtlas;
 
     private Box2DDebugRenderer box2DDebugRenderer;
@@ -51,7 +55,6 @@ public class PlayScreen implements Screen {
     public PlayScreen(SuperMario game) {
         this.game = game;
     }
-
 
     @Override
     public void show() {
@@ -68,6 +71,9 @@ public class PlayScreen implements Screen {
         TmxMapLoader tmxMapLoader = new TmxMapLoader();
         tiledMap = tmxMapLoader.load("maps/Level_01.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1 / GameManager.PPM);
+
+        mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();
+        mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight();
 
         world = new World(GameManager.GRAVITY, true);
         world.setContactListener(new WorldContactListener());
@@ -93,11 +99,20 @@ public class PlayScreen implements Screen {
             accumulator -= GameManager.STEP;
         }
 
-
         mario.update(delta);
-        camera.position.x = mario.getPosition().x;
 
+        float targetX = mario.getPosition().x;
+
+        if (targetX < GameManager.V_WIDTH / 2) {
+            targetX = GameManager.V_WIDTH / 2;
+        }
+        else if (targetX > mapWidth - GameManager.V_WIDTH / 2) {
+            targetX = mapWidth - GameManager.V_WIDTH / 2;
+        }
+
+        camera.position.x = MathUtils.lerp(camera.position.x, targetX, 0.1f);
         camera.update();
+
         mapRenderer.setView(camera);
 
     }
@@ -122,7 +137,7 @@ public class PlayScreen implements Screen {
 
         game.batch.end();
 
-//        box2DDebugRenderer.render(world, camera.combined);
+        box2DDebugRenderer.render(world, camera.combined);
 
     }
 

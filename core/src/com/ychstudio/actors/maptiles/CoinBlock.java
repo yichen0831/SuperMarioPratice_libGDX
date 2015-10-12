@@ -1,18 +1,20 @@
-package com.ychstudio.actors;
+package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
 /**
- * Created by yichen on 10/11/15.
+ * Created by yichen on 10/12/15.
  *
- * RigidBody
+ * CoinBlock
  */
-public class Rock extends MapTileObject {
+public class CoinBlock extends MapTileObject {
 
-    public Rock(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
+    public CoinBlock(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
         super(playScreen, x, y, textureRegion);
     }
 
@@ -37,5 +39,4 @@ public class Rock extends MapTileObject {
         shape.dispose();
 
     }
-
 }

@@ -1,4 +1,4 @@
-package com.ychstudio.actors;
+package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -10,11 +10,11 @@ import com.ychstudio.screens.PlayScreen;
 /**
  * Created by yichen on 10/11/15.
  *
- * Brick
+ * RigidBody
  */
-public class Brick extends MapTileObject {
+public class Rock extends MapTileObject {
 
-    public Brick(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
+    public Rock(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
         super(playScreen, x, y, textureRegion);
     }
 
@@ -37,5 +37,7 @@ public class Brick extends MapTileObject {
         body.createFixture(fixtureDef).setUserData(this);
 
         shape.dispose();
+
     }
+
 }
