@@ -7,11 +7,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.EdgeShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -29,6 +27,8 @@ public class Mario extends RigidBody {
         FALLING,
     }
 
+    private final float radius = 6.8f / GameManager.PPM;
+
     private State currentState;
 
     private float stateTime;
@@ -40,6 +40,9 @@ public class Mario extends RigidBody {
     private boolean facingRight;
 
     private boolean grownUp;
+
+    private boolean grounded;
+    private boolean jump;
 
     private AssetManager assetManager;
 
@@ -64,13 +67,14 @@ public class Mario extends RigidBody {
 
         facingRight = true;
         grownUp = false;
+        jump = false;
 
         assetManager = GameManager.instance.getAssetManager();
     }
 
+
     @Override
     protected void defBody() {
-        float radius = 6.8f / GameManager.PPM;
 
         BodyDef bodyDef = new BodyDef();
 
@@ -111,9 +115,10 @@ public class Mario extends RigidBody {
     private void handleInput() {
 
         // Jump
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && canJump()) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && grounded) {
             body.applyLinearImpulse(new Vector2(0.0f, 20.0f), body.getLocalCenter(), true);
             assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
+            jump = true;
         }
 
         // Move left
@@ -136,29 +141,68 @@ public class Mario extends RigidBody {
         return grownUp;
     }
 
-    private boolean canJump() {
-        return !(currentState == State.FALLING || currentState == State.JUMPING);
+    public boolean canJump() {
+        checkGrounded();
+        return grounded;
+    }
+
+    private void checkGrounded() {
+        grounded = false;
+
+        Vector2 p1;
+        Vector2 p2;
+
+        RayCastCallback rayCastCallback = new RayCastCallback() {
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                if (fixture.getUserData().getClass() == Mario.class) {
+                    return 1;
+                }
+
+                if (fraction < 1) {
+                    grounded = true;
+                    return 0;
+                }
+                return 0;
+            }
+        };
+
+        for (int i = 0; i < 3; i++) {
+            p1 = new Vector2(body.getPosition().x - radius / 2 * (1 - i), body.getPosition().y - radius);
+            p2 = new Vector2(p1.x, p1.y - 0.05f);
+            world.rayCast(rayCastCallback, p1, p2);
+        }
+
     }
 
     @Override
     public void update(float delta) {
+        checkGrounded();
         handleInput();
 
         State previousState = currentState;
 
-        // checking state
-        if (body.getLinearVelocity().y > 0.01f || (body.getLinearVelocity().y < -0.01f && previousState == State.JUMPING)) {
-            currentState = State.JUMPING;
-        }
-        else if (body.getLinearVelocity().y < -0.01f) {
-            currentState = State.FALLING;
-        }
-        else if (body.getLinearVelocity().x != 0) {
-            currentState = State.RUNNING;
+        if (!grounded) {
+            if (jump) {
+                currentState = State.JUMPING;
+            }
+            else {
+                currentState = State.FALLING;
+            }
+
         }
         else {
-            currentState = State.STANDING;
+            if (body.getLinearVelocity().x != 0) {
+                currentState = State.RUNNING;
+            }
+            else {
+                currentState = State.STANDING;
+            }
+            if (previousState == State.JUMPING) {
+                jump = false;
+            }
         }
+
 
         switch (currentState) {
             case RUNNING:

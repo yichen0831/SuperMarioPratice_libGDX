@@ -52,6 +52,7 @@ public class PlayScreen implements Screen {
     private TextureAtlas textureAtlas;
 
     private Box2DDebugRenderer box2DDebugRenderer;
+    private boolean renderB2DDebug;
 
     private Array<MapTileObject> mapTileObjects;
 
@@ -104,8 +105,6 @@ public class PlayScreen implements Screen {
         world = new World(GameManager.GRAVITY, true);
         world.setContactListener(new WorldContactListener());
 
-        box2DDebugRenderer = new Box2DDebugRenderer();
-
         WorldCreator worldCreator = new WorldCreator(this, tiledMap);
         mapTileObjects = worldCreator.getMapTileObject();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
@@ -116,6 +115,10 @@ public class PlayScreen implements Screen {
 
         assetManager.get("audio/music/mario_music.ogg", Music.class).setLooping(true);
         assetManager.get("audio/music/mario_music.ogg", Music.class).play();
+
+        box2DDebugRenderer = new Box2DDebugRenderer();
+        renderB2DDebug = false;
+
     }
 
     public TextureAtlas getTextureAtlas() {
@@ -143,6 +146,11 @@ public class PlayScreen implements Screen {
             else {
                 assetManager.get("audio/music/mario_music.ogg", Music.class).play();
             }
+        }
+
+        // Press B to toggle Box2DDebuggerRenderer
+        if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
+            renderB2DDebug = !renderB2DDebug;
         }
     }
 
@@ -177,7 +185,7 @@ public class PlayScreen implements Screen {
 
         hud.update(delta);
 
-        cleanUpDestroyedObjects();
+//        cleanUpDestroyedObjects(); // do not need to clean yet as performance concerns
     }
 
     private void cleanUpDestroyedObjects() {
@@ -208,8 +216,11 @@ public class PlayScreen implements Screen {
 
         game.batch.end();
 
-        box2DDebugRenderer.render(world, camera.combined);
         hud.draw();
+
+        if (renderB2DDebug) {
+            box2DDebugRenderer.render(world, camera.combined);
+        }
 
     }
 

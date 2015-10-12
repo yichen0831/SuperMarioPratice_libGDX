@@ -6,10 +6,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.ychstudio.actors.maptiles.Brick;
-import com.ychstudio.actors.maptiles.CoinBlock;
-import com.ychstudio.actors.maptiles.MapTileObject;
-import com.ychstudio.actors.maptiles.Rock;
+import com.ychstudio.actors.maptiles.*;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -34,6 +31,15 @@ public class WorldCreator {
             float y = ((TiledMapTileMapObject) mapObject).getY();
 
             mapTileObjects.add(new Rock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, ((TiledMapTileMapObject) mapObject).getTextureRegion()));
+
+        }
+
+        mapLayer = tiledMap.getLayers().get("Pipes");
+        for (MapObject mapObject : mapLayer.getObjects()) {
+            float x = ((TiledMapTileMapObject) mapObject).getX();
+            float y = ((TiledMapTileMapObject) mapObject).getY();
+
+            mapTileObjects.add(new Pipe(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, ((TiledMapTileMapObject) mapObject).getTextureRegion()));
 
         }
 
