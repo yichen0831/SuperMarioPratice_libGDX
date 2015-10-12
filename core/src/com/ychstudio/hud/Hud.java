@@ -21,7 +21,6 @@ public class Hud implements Disposable {
 
     private Stage stage;
 
-    private int score;
     private int time;
     private int level;
 
@@ -40,7 +39,6 @@ public class Hud implements Disposable {
         Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 2, GameManager.WINDOW_HEIGHT / 2, new OrthographicCamera());
         stage = new Stage(viewport, batch);
 
-        score = 0;
         time = 300;
         level = 1;
 
@@ -48,7 +46,7 @@ public class Hud implements Disposable {
         timeTextLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelTextLabel = new Label("LEVEL", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
-        scoreLabel = new Label(String.format("%06d", score), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         timeLable = new Label(String.format("%03d", time), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelLabel = new Label(String.format("%02d", level), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
@@ -72,6 +70,7 @@ public class Hud implements Disposable {
     }
 
     public void draw() {
+        scoreLabel.setText(String.format("%06d", GameManager.instance.getScore()));
         stage.draw();
     }
 
@@ -83,11 +82,6 @@ public class Hud implements Disposable {
             accumulator -= 1.0f;
             timeLable.setText(String.format("%03d", time));
         }
-    }
-
-    public void addScore(int value) {
-        score += value;
-        scoreLabel.setText(String.format("%06d", score));
     }
 
     @Override

@@ -1,7 +1,11 @@
 package com.ychstudio.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -55,8 +59,27 @@ public class PlayScreen implements Screen {
 
     private Hud hud;
 
+    private AssetManager assetManager;
+
     public PlayScreen(SuperMario game) {
         this.game = game;
+        assetManager = GameManager.instance.getAssetManager();
+        loadAudio();
+    }
+
+    private void loadAudio() {
+        assetManager.load("audio/music/mario_music.ogg", Music.class);
+        assetManager.load("audio/sfx/breakblock.wav", Sound.class);
+        assetManager.load("audio/sfx/bump.wav", Sound.class);
+        assetManager.load("audio/sfx/coin.wav", Sound.class);
+        assetManager.load("audio/sfx/jump_small.wav", Sound.class);
+        assetManager.load("audio/sfx/jump_super.wav", Sound.class);
+        assetManager.load("audio/sfx/mariodie.wav", Sound.class);
+        assetManager.load("audio/sfx/powerdown.wav", Sound.class);
+        assetManager.load("audio/sfx/powerup.wav", Sound.class);
+        assetManager.load("audio/sfx/powerup_spawn.wav", Sound.class);
+        assetManager.load("audio/sfx/stomp.wav", Sound.class);
+        assetManager.finishLoading();
     }
 
     @Override
@@ -90,6 +113,9 @@ public class PlayScreen implements Screen {
         hud = new Hud(game.batch);
 
         accumulator = 0;
+
+        assetManager.get("audio/music/mario_music.ogg", Music.class).setLooping(true);
+        assetManager.get("audio/music/mario_music.ogg", Music.class).play();
     }
 
     public TextureAtlas getTextureAtlas() {
@@ -108,7 +134,21 @@ public class PlayScreen implements Screen {
         return mapHeight;
     }
 
+    public void handleInput() {
+        // Press M to pause or continue background music
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            if (assetManager.get("audio/music/mario_music.ogg", Music.class).isPlaying()) {
+                assetManager.get("audio/music/mario_music.ogg", Music.class).pause();
+            }
+            else {
+                assetManager.get("audio/music/mario_music.ogg", Music.class).play();
+            }
+        }
+    }
+
     public void update(float delta) {
+        handleInput();
+
         accumulator += delta;
         if (accumulator > GameManager.STEP) {
             world.step(GameManager.STEP, 6, 2);

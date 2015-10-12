@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="48" height="18" tilewidth="16" tileheight="16" nextobjectid="53">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="48" height="18" tilewidth="16" tileheight="16" nextobjectid="71">
  <tileset firstgid="1" name="tileset_gutter" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="924">
   <image source="tileset_gutter.png" width="594" height="504"/>
  </tileset>
@@ -65,12 +65,30 @@
   <object id="37" gid="2" x="160" y="224" width="16" height="16"/>
   <object id="51" gid="2" x="320" y="224" width="16" height="16"/>
   <object id="52" gid="2" x="336" y="224" width="16" height="16"/>
+  <object id="56" gid="2" x="512" y="144" width="16" height="16"/>
+  <object id="57" gid="2" x="528" y="144" width="16" height="16"/>
+  <object id="58" gid="2" x="560" y="144" width="16" height="16"/>
+  <object id="59" gid="2" x="576" y="144" width="16" height="16"/>
+  <object id="60" gid="2" x="528" y="224" width="16" height="16"/>
+  <object id="61" gid="2" x="544" y="224" width="16" height="16"/>
+  <object id="62" gid="2" x="576" y="224" width="16" height="16"/>
+  <object id="63" gid="2" x="560" y="224" width="16" height="16"/>
+  <object id="64" gid="2" x="624" y="224" width="16" height="16"/>
+  <object id="65" gid="2" x="640" y="224" width="16" height="16"/>
+  <object id="66" gid="2" x="656" y="224" width="16" height="16"/>
+  <object id="67" gid="2" x="672" y="224" width="16" height="16"/>
+  <object id="68" gid="2" x="688" y="160" width="16" height="16"/>
+  <object id="69" gid="2" x="704" y="160" width="16" height="16"/>
+  <object id="70" gid="2" x="720" y="160" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="CoinBlocks">
   <object id="49" gid="25" x="304" y="224" width="16" height="16"/>
   <object id="50" gid="25" x="352" y="224" width="16" height="16"/>
+  <object id="53" gid="25" x="592" y="144" width="16" height="16"/>
+  <object id="54" gid="25" x="544" y="144" width="16" height="16"/>
+  <object id="55" gid="25" x="496" y="144" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Start">
-  <object id="38" gid="64" x="32" y="256" width="16" height="16"/>
+  <object id="38" gid="64" x="32" y="272" width="16" height="16"/>
  </objectgroup>
 </map>

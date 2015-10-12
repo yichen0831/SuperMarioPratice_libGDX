@@ -29,15 +29,36 @@ public class GameManager implements Disposable {
     public static final short MARIO_BIT = 1 << 1;
     public static final short MARIO_HEAD_BIT = 1 << 2;
 
+    private AssetManager assetManager;
 
-    public AssetManager assetManager;
+    private int score;
 
     public GameManager() {
         if (instance == null) {
             instance = this;
         }
 
-        assetManager = new AssetManager();
+        if (assetManager == null) {
+            assetManager = new AssetManager();
+        }
+
+        score = 0;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void clearScore() {
+        score = 0;
+    }
+
+    public void addScore(int value) {
+        score += value;
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
     }
 
 

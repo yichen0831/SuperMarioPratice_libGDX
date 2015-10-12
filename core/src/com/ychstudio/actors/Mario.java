@@ -2,6 +2,8 @@ package com.ychstudio.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -37,6 +39,10 @@ public class Mario extends RigidBody {
 
     private boolean facingRight;
 
+    private boolean grownUp;
+
+    private AssetManager assetManager;
+
     public Mario(PlayScreen playScreen, float x, float y) {
         super(playScreen, x, y);
         TextureAtlas textureAtlas = playScreen.getTextureAtlas();
@@ -50,7 +56,6 @@ public class Mario extends RigidBody {
         }
         running = new Animation(0.1f, keyFrames);
 
-
         setRegion(standing);
         setBounds(getX(), getY(), 16 / GameManager.PPM, 16 / GameManager.PPM);
 
@@ -58,6 +63,9 @@ public class Mario extends RigidBody {
         stateTime = 0;
 
         facingRight = true;
+        grownUp = false;
+
+        assetManager = GameManager.instance.getAssetManager();
     }
 
     @Override
@@ -100,15 +108,20 @@ public class Mario extends RigidBody {
         edgeShape.dispose();
     }
 
-    private void handleInput(float delta) {
+    private void handleInput() {
+
+        // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && canJump()) {
             body.applyLinearImpulse(new Vector2(0.0f, 20.0f), body.getLocalCenter(), true);
+            assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
         }
 
+        // Move left
         if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -10.0f) {
             body.applyForceToCenter(new Vector2(-36.0f, 0.0f), true);
         }
 
+        // Move right
         if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < 10.0f) {
             body.applyForceToCenter(new Vector2(36.0f, 0.0f), true);
         }
@@ -119,13 +132,17 @@ public class Mario extends RigidBody {
         return body.getPosition();
     }
 
+    public boolean isGrownUp() {
+        return grownUp;
+    }
+
     private boolean canJump() {
         return !(currentState == State.FALLING || currentState == State.JUMPING);
     }
 
     @Override
     public void update(float delta) {
-        handleInput(delta);
+        handleInput();
 
         State previousState = currentState;
 
