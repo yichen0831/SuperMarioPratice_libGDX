@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.ychstudio.actors.Collider;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -38,5 +39,12 @@ public class CoinBlock extends MapTileObject {
 
         shape.dispose();
 
+    }
+
+    @Override
+    public void onTrigger(Collider other) {
+        if (other.getFilter().categoryBits == GameManager.MARIO_HEAD_BIT) {
+            System.out.println("hit!");
+        }
     }
 }

@@ -6,7 +6,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.EdgeShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -82,7 +85,15 @@ public class Mario extends RigidBody {
         // Mario's feet
         EdgeShape edgeShape = new EdgeShape();
         fixtureDef.shape = edgeShape;
-        edgeShape.set(new Vector2(-radius, -radius), new Vector2(radius, -radius));
+        edgeShape.set(new Vector2(-radius / 2, -radius), new Vector2(radius / 2, -radius));
+        body.createFixture(fixtureDef).setUserData(this);
+
+        // Mario's head
+        edgeShape.set(new Vector2(-radius / 6, radius), new Vector2(radius / 6, radius));
+        fixtureDef.shape = edgeShape;
+        fixtureDef.filter.categoryBits = GameManager.MARIO_HEAD_BIT;
+        fixtureDef.isSensor = true;
+
         body.createFixture(fixtureDef).setUserData(this);
 
         shape.dispose();

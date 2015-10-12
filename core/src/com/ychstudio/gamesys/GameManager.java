@@ -27,6 +27,7 @@ public class GameManager implements Disposable {
 
     public static final short GROUND_BIT = 1;
     public static final short MARIO_BIT = 1 << 1;
+    public static final short MARIO_HEAD_BIT = 1 << 2;
 
 
     public AssetManager assetManager;

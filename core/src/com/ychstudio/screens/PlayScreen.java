@@ -19,6 +19,7 @@ import com.ychstudio.SuperMario;
 import com.ychstudio.actors.Mario;
 import com.ychstudio.actors.maptiles.MapTileObject;
 import com.ychstudio.gamesys.GameManager;
+import com.ychstudio.hud.Hud;
 import com.ychstudio.utils.WorldContactListener;
 import com.ychstudio.utils.WorldCreator;
 
@@ -52,6 +53,8 @@ public class PlayScreen implements Screen {
 
     private Mario mario;
 
+    private Hud hud;
+
     public PlayScreen(SuperMario game) {
         this.game = game;
     }
@@ -84,12 +87,17 @@ public class PlayScreen implements Screen {
         mapTileObjects = worldCreator.getMapTileObject();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
 
+        hud = new Hud(game.batch);
 
         accumulator = 0;
     }
 
     public TextureAtlas getTextureAtlas() {
         return textureAtlas;
+    }
+
+    public TiledMap getTiledMap() {
+        return tiledMap;
     }
 
     public float getMapWidth() {
@@ -123,6 +131,7 @@ public class PlayScreen implements Screen {
 
         mapRenderer.setView(camera);
 
+        hud.update(delta);
     }
 
     @Override
@@ -146,6 +155,7 @@ public class PlayScreen implements Screen {
         game.batch.end();
 
         box2DDebugRenderer.render(world, camera.combined);
+        hud.draw();
 
     }
 
@@ -175,5 +185,6 @@ public class PlayScreen implements Screen {
         world.dispose();
         textureAtlas.dispose();
         box2DDebugRenderer.dispose();
+        hud.dispose();
     }
 }
