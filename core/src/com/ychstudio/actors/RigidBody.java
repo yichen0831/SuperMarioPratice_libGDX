@@ -15,9 +15,15 @@ public abstract class RigidBody extends Sprite {
     protected World world;
     protected Body body;
 
+    protected boolean toBeDestroyed;
+    protected boolean destroyed;
+
     public RigidBody(PlayScreen playScreen, float x, float y) {
         this.playScreen = playScreen;
         this.world = playScreen.world;
+
+        toBeDestroyed = false;
+        destroyed = false;
 
         setPosition(x, y);
         defBody();
@@ -37,5 +43,11 @@ public abstract class RigidBody extends Sprite {
 
     }
 
+    public void queueDestroy() {
+        toBeDestroyed = true;
+    }
 
+    public boolean isDestroyed() {
+        return destroyed;
+    }
 }

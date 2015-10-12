@@ -155,6 +155,10 @@ public class PlayScreen implements Screen {
             accumulator -= GameManager.STEP;
         }
 
+        for (MapTileObject mapTileObject : mapTileObjects) {
+            mapTileObject.update(delta);
+        }
+
         mario.update(delta);
 
         float targetX = mario.getPosition().x;
@@ -172,6 +176,16 @@ public class PlayScreen implements Screen {
         mapRenderer.setView(camera);
 
         hud.update(delta);
+
+        cleanUpDestroyedObjects();
+    }
+
+    private void cleanUpDestroyedObjects() {
+        for (int i = 0; i < mapTileObjects.size; i++) {
+            if (mapTileObjects.get(i).isDestroyed()) {
+                mapTileObjects.removeIndex(i);
+            }
+        }
     }
 
     @Override
