@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -38,6 +40,8 @@ public class PlayScreen implements Screen {
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer mapRenderer;
 
+    private TextureAtlas textureAtlas;
+
     private Box2DDebugRenderer box2DDebugRenderer;
 
     private Array<MapTileObject> mapTileObjects;
@@ -59,6 +63,8 @@ public class PlayScreen implements Screen {
 
         camera.position.set(GameManager.V_WIDTH / 2, GameManager.V_HEIGHT / 2, 0);
 
+        textureAtlas = new TextureAtlas("imgs/actors.atlas");
+
         TmxMapLoader tmxMapLoader = new TmxMapLoader();
         tiledMap = tmxMapLoader.load("maps/Level_01.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1 / GameManager.PPM);
@@ -74,6 +80,10 @@ public class PlayScreen implements Screen {
 
 
         accumulator = 0;
+    }
+
+    public TextureAtlas getTextureAtlas() {
+        return textureAtlas;
     }
 
     public void update(float delta) {
@@ -108,9 +118,11 @@ public class PlayScreen implements Screen {
             mapTileObject.draw(game.batch);
         }
 
+        mario.draw(game.batch);
+
         game.batch.end();
 
-        box2DDebugRenderer.render(world, camera.combined);
+//        box2DDebugRenderer.render(world, camera.combined);
 
     }
 
@@ -138,6 +150,7 @@ public class PlayScreen implements Screen {
     public void dispose() {
         tiledMap.dispose();
         world.dispose();
+        textureAtlas.dispose();
         box2DDebugRenderer.dispose();
     }
 }

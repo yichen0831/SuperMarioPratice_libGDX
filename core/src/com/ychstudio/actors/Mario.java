@@ -2,8 +2,12 @@ package com.ychstudio.actors;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -13,14 +17,49 @@ import com.ychstudio.screens.PlayScreen;
  * Mario
  */
 public class Mario extends RigidBody {
+    public enum State {
+        STANDING,
+        RUNNING,
+        JUMPING,
+        FALLING,
+    }
+
+    private State currentState;
+
+    private float stateTime;
+
+    private TextureRegion standing;
+    private TextureRegion jumping;
+    private Animation running;
+
+    private boolean facingRight;
 
     public Mario(PlayScreen playScreen, float x, float y) {
         super(playScreen, x, y);
+        TextureAtlas textureAtlas = playScreen.getTextureAtlas();
+
+        standing = new TextureRegion(textureAtlas.findRegion("Mario_small"), 0, 0, 16, 16);
+        jumping = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 5, 0, 16, 16);
+
+        Array<TextureRegion> keyFrames = new Array<TextureRegion>();
+        for (int i = 1; i < 4; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * i, 0, 16, 16));
+        }
+        running = new Animation(0.1f, keyFrames);
+
+
+        setRegion(standing);
+        setBounds(getX(), getY(), 16 / GameManager.PPM, 16 / GameManager.PPM);
+
+        currentState = State.STANDING;
+        stateTime = 0;
+
+        facingRight = true;
     }
 
     @Override
     protected void defBody() {
-        float radius = 6.0f / GameManager.PPM;
+        float radius = 6.8f / GameManager.PPM;
 
         BodyDef bodyDef = new BodyDef();
 
@@ -56,11 +95,11 @@ public class Mario extends RigidBody {
         }
 
         if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -10.0f) {
-            body.applyForceToCenter(new Vector2(-24.0f, 0.0f), true);
+            body.applyForceToCenter(new Vector2(-36.0f, 0.0f), true);
         }
 
         if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < 10.0f) {
-            body.applyForceToCenter(new Vector2(24.0f, 0.0f), true);
+            body.applyForceToCenter(new Vector2(36.0f, 0.0f), true);
         }
 
 
@@ -73,10 +112,54 @@ public class Mario extends RigidBody {
     @Override
     public void update(float delta) {
         handleInput(delta);
+
+        State previousState = currentState;
+
+        // checking state
+        if (body.getLinearVelocity().y > 0.01f || (body.getLinearVelocity().y < -0.01f && previousState == State.JUMPING)) {
+            currentState = State.JUMPING;
+        }
+        else if (body.getLinearVelocity().y < -0.01f) {
+            currentState = State.FALLING;
+        }
+        else if (body.getLinearVelocity().x != 0) {
+            currentState = State.RUNNING;
+        }
+        else {
+            currentState = State.STANDING;
+        }
+
+        switch (currentState) {
+            case RUNNING:
+                setRegion(running.getKeyFrame(stateTime, true));
+                break;
+            case JUMPING:
+                setRegion(jumping);
+                break;
+            case FALLING:
+            case STANDING:
+            default:
+                setRegion(standing);
+                break;
+        }
+
+
+        if ((body.getLinearVelocity().x < -0.01f || !facingRight)) {
+            flip(true, false);
+            facingRight = false;
+        }
+
+        if (body.getLinearVelocity().x > 0.01f){
+            facingRight = true;
+        }
+
+        stateTime = previousState == currentState ? stateTime + delta : 0;
+        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+
     }
 
     @Override
-    public void onCollide(Fixture other) {
+    public void onCollide(Collider other) {
 
 //        System.out.println("I collided with " + other.getFilterData().categoryBits);
     }

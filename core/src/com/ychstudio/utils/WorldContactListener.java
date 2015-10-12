@@ -1,6 +1,7 @@
 package com.ychstudio.utils;
 
 import com.badlogic.gdx.physics.box2d.*;
+import com.ychstudio.actors.Collider;
 import com.ychstudio.actors.RigidBody;
 
 /**
@@ -16,12 +17,12 @@ public class WorldContactListener implements ContactListener {
         Fixture fixtureB = contact.getFixtureB();
 
         if (fixtureA.isSensor() || fixtureB.isSensor()) {
-            ((RigidBody) fixtureA.getUserData()).onTrigger(fixtureB);
-            ((RigidBody) fixtureB.getUserData()).onTrigger(fixtureA);
+            ((RigidBody) fixtureA.getUserData()).onTrigger(new Collider(fixtureB));
+            ((RigidBody) fixtureB.getUserData()).onTrigger(new Collider(fixtureA));
         }
         else {
-            ((RigidBody) fixtureA.getUserData()).onCollide(fixtureB);
-            ((RigidBody) fixtureB.getUserData()).onCollide(fixtureA);
+            ((RigidBody) fixtureA.getUserData()).onCollide(new Collider(fixtureB));
+            ((RigidBody) fixtureB.getUserData()).onCollide(new Collider(fixtureA));
         }
 
     }

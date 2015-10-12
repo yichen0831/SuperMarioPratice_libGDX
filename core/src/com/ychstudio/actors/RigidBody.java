@@ -2,7 +2,6 @@ package com.ychstudio.actors;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ychstudio.screens.PlayScreen;
 
@@ -28,11 +27,11 @@ public abstract class RigidBody extends Sprite {
 
     }
 
-    public void onCollide(Fixture other) {
+    public void onCollide(Collider other) {
 
     }
 
-    public void onTrigger(Fixture other) {
+    public void onTrigger(Collider other) {
 
     }
 
