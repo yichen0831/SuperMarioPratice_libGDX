@@ -27,6 +27,7 @@ public class Mario extends RigidBody {
         JUMPING,
         FALLING,
         GROWING,
+        SHRINKING,
         DYING,
     }
 
@@ -41,6 +42,7 @@ public class Mario extends RigidBody {
     private Animation runningSmall;
 
     private Animation growing;
+    private Animation shrinking;
     private TextureRegion dying;
 
     private TextureRegion standingBig;
@@ -50,6 +52,7 @@ public class Mario extends RigidBody {
     private boolean facingRight;
 
     private boolean isGrownUp;
+    private boolean isDead;
 
     private boolean grounded;
     private boolean jump;
@@ -89,6 +92,15 @@ public class Mario extends RigidBody {
             keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32));
         }
         growing = new Animation(0.1f, keyFrames);
+
+        keyFrames.clear();
+        // shrinking animation
+        for (int i = 0; i < 3; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32));
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 15, 0, 16, 32));
+        }
+        keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_small"), 0, 0, 16, 32));
+        shrinking = new Animation(0.1f, keyFrames);
 
         dying = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 6, 0, 16, 16);
 
@@ -148,12 +160,11 @@ public class Mario extends RigidBody {
         edgeShape.dispose();
     }
 
-    private void defBigMario() {
-        Vector2 position = new Vector2(body.getPosition());
+    private void defSmallMario() {
+        Vector2 position = body.getPosition();
+        Vector2 velocity = body.getLinearVelocity();
 
-        if (body != null) {
-            world.destroyBody(body);
-        }
+        world.destroyBody(body);
 
         BodyDef bodyDef = new BodyDef();
 
@@ -161,6 +172,50 @@ public class Mario extends RigidBody {
         bodyDef.position.set(position.x, position.y);
 
         body = world.createBody(bodyDef);
+        body.setLinearVelocity(velocity);
+
+        // Mario's body
+        CircleShape shape = new CircleShape();
+        shape.setRadius(radius);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.filter.categoryBits = GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.ENEMY_WEAKNESS_BIT | GameManager.ENEMY_LETHAL_BIT | GameManager.ITEM_BIT;
+
+        body.createFixture(fixtureDef).setUserData(this);
+
+        // Mario's feet
+        EdgeShape edgeShape = new EdgeShape();
+        edgeShape.set(new Vector2(-radius, -radius), new Vector2(radius, -radius));
+        fixtureDef.shape = edgeShape;
+        body.createFixture(fixtureDef).setUserData(this);
+
+        // Mario's head
+        edgeShape.set(new Vector2(-radius / 6, radius), new Vector2(radius / 6, radius));
+        fixtureDef.shape = edgeShape;
+        fixtureDef.filter.categoryBits = GameManager.MARIO_HEAD_BIT;
+        fixtureDef.isSensor = true;
+
+        body.createFixture(fixtureDef).setUserData(this);
+
+        shape.dispose();
+        edgeShape.dispose();
+    }
+
+    private void defBigMario() {
+        Vector2 position = new Vector2(body.getPosition());
+        Vector2 velocity = body.getLinearVelocity();
+
+        world.destroyBody(body);
+
+        BodyDef bodyDef = new BodyDef();
+
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(position.x, position.y);
+
+        body = world.createBody(bodyDef);
+        body.setLinearVelocity(velocity);
 
         // Mario's body
         CircleShape shape = new CircleShape();
@@ -225,6 +280,10 @@ public class Mario extends RigidBody {
         return isGrownUp;
     }
 
+    public boolean isDead() {
+        return isDead;
+    }
+
     private void checkGrounded() {
         grounded = false;
 
@@ -258,14 +317,42 @@ public class Mario extends RigidBody {
     public void update(float delta) {
         checkGrounded();
 
-//        if (!die) {
+        // die when falling below ground
+        if (body.getPosition().y < -0.5f) {
+            die = true;
+        }
+
+        if (!isDead) {
             handleInput();
-//        }
+        }
 
         State previousState = currentState;
 
         if (die) {
+            if (!isDead) {
+                assetManager.get("audio/sfx/mariodie.wav", Sound.class).play();
+                body.applyLinearImpulse(new Vector2(0.0f, 12.0f), body.getWorldCenter(), true);
+            }
+            isDead = true;
+            // do not collide with anything anymore
+            for (Fixture fixture : body.getFixtureList()) {
+                Filter filter = fixture.getFilterData();
+                filter.maskBits = GameManager.NOTHING_BIT;
+                fixture.setFilterData(filter);
+            }
+
+            if (stateTime < 0.2f) {
+                GameManager.setTimeScale(0.1f);
+            }
+            else {
+                GameManager.setTimeScale(1.0f);
+            }
+
             currentState = State.DYING;
+        }
+        else if (shrink) {
+            currentState = State.SHRINKING;
+            isGrownUp = false;
         }
         else if (growUp) {
             currentState = State.GROWING;
@@ -300,6 +387,21 @@ public class Mario extends RigidBody {
         switch (currentState) {
             case DYING:
                 setRegion(dying);
+                break;
+            case SHRINKING:
+                setRegion(shrinking.getKeyFrame(stateTime, false));
+                // temporarily not collide with enemies
+                for (Fixture fixture : body.getFixtureList()) {
+                    Filter filter = fixture.getFilterData();
+                    filter.maskBits = GameManager.GROUND_BIT | GameManager.ITEM_BIT;
+                    fixture.setFilterData(filter);
+                }
+
+                if (shrinking.isAnimationFinished(stateTime)) {
+                    setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 16 / GameManager.PPM);
+                    shrink = false;
+                    defSmallMario();
+                }
                 break;
             case GROWING:
                 setRegion(growing.getKeyFrame(stateTime, false));
@@ -366,9 +468,12 @@ public class Mario extends RigidBody {
             ((Enemy) other.getUserData()).getDamage(1);
         }
         else if (other.getFilter().categoryBits == GameManager.ENEMY_LETHAL_BIT) {
+            // temporarily invincible when shrinking
+            if (shrink) {
+                return;
+            }
 
             if (!isGrownUp) {
-                assetManager.get("audio/sfx/mariodie.wav", Sound.class).play();
                 die = true;
             }
             else {

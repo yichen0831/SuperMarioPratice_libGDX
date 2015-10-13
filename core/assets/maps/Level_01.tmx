@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="48" height="18" tilewidth="16" tileheight="16" nextobjectid="133">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="48" height="18" tilewidth="16" tileheight="16" nextobjectid="136">
  <tileset firstgid="1" name="tileset_gutter" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="924">
   <image source="tileset_gutter.png" width="594" height="504"/>
  </tileset>

@@ -202,12 +202,19 @@ public class PlayScreen implements Screen {
         }
     }
 
+    public void handleMusic() {
+        if (mario.isDead()) {
+            assetManager.get("audio/music/mario_music.ogg", Music.class).stop();
+        }
+    }
+
     public void update(float delta) {
         delta *= GameManager.timeScale;
         float step = GameManager.STEP * GameManager.timeScale;
 
         handleInput();
         handleSpawningItem();
+        handleMusic();
 
         // Box2D world step
         accumulator += delta;
@@ -236,7 +243,9 @@ public class PlayScreen implements Screen {
 
 
         // camera control
-        float targetX = mario.getPosition().x;
+        float targetX = camera.position.x;
+        if (!mario.isDead())
+            targetX = mario.getPosition().x;
 
         if (targetX < GameManager.V_WIDTH / 2) {
             targetX = GameManager.V_WIDTH / 2;

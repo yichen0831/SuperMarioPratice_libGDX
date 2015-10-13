@@ -26,7 +26,7 @@ public class GameManager implements Disposable {
 
     public static final float STEP = 1 / 60.0f;
 
-
+    public static final short NOTHING_BIT = 0;
     public static final short GROUND_BIT = 1;
     public static final short MARIO_BIT = 1 << 1;
     public static final short MARIO_HEAD_BIT = 1 << 2;

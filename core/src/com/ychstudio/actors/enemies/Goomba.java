@@ -98,6 +98,7 @@ public class Goomba extends Enemy {
                 world.destroyBody(body);
                 setBounds(0, 0, 0, 0);
                 destroyed = true;
+                return;
             }
         }
         else {
@@ -112,7 +113,6 @@ public class Goomba extends Enemy {
                 body.setLinearVelocity(new Vector2(-speed, velocityY));
             }
         }
-
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
     }
 
