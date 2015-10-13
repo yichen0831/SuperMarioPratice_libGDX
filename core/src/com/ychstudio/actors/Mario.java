@@ -25,6 +25,7 @@ public class Mario extends RigidBody {
         STANDING,
         RUNNING,
         JUMPING,
+        CROUCHING,
         FALLING,
         GROWING,
         SHRINKING,
@@ -51,6 +52,7 @@ public class Mario extends RigidBody {
     private Animation growing;
     private Animation shrinking;
     private TextureRegion dying;
+    private TextureRegion crouching;
 
     private TextureRegion standingBig;
     private TextureRegion jumpingBig;
@@ -66,6 +68,7 @@ public class Mario extends RigidBody {
     private boolean die;
     private boolean growUp;
     private boolean shrink;
+    private boolean crouch;
 
     private AssetManager assetManager;
 
@@ -111,6 +114,8 @@ public class Mario extends RigidBody {
 
         dying = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 6, 0, 16, 16);
 
+        crouching = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 6, 0, 16, 32);
+
         setRegion(standingSmall);
         setBounds(getX(), getY(), 16 / GameManager.PPM, 16 / GameManager.PPM);
 
@@ -123,6 +128,7 @@ public class Mario extends RigidBody {
         die = false;
         shrink = false;
         growUp = false;
+        crouch = false;
 
         keyPressedTime = 99.0f;
 
@@ -290,14 +296,30 @@ public class Mario extends RigidBody {
             }
         }
 
+        // crouch
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            if (!crouch) {
+                crouch = isGrownUp;
+                if (crouch) {
+                    defSmallMario();
+                }
+            }
+        }
+        else {
+            if (crouch) {
+                defBigMario();
+            }
+            crouch = false;
+        }
+
 
         // Move left
-        if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -maxSpeed) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -maxSpeed && !crouch) {
             body.applyForceToCenter(new Vector2(-force, 0.0f), true);
         }
 
         // Move right
-        if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < maxSpeed) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < maxSpeed && !crouch) {
             body.applyForceToCenter(new Vector2(force, 0.0f), true);
         }
 
@@ -346,6 +368,8 @@ public class Mario extends RigidBody {
 
     @Override
     public void update(float delta) {
+
+
         checkGrounded();
 
         // die when falling below ground
@@ -358,7 +382,9 @@ public class Mario extends RigidBody {
             handleInput();
         }
 
+
         State previousState = currentState;
+
 
         if (die) {
             if (!isDead) {
@@ -391,6 +417,9 @@ public class Mario extends RigidBody {
             isGrownUp = true;
             setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 32 / GameManager.PPM);
         }
+        else if (crouch) {
+            currentState = State.CROUCHING;
+        }
         else if (!grounded) {
             if (jump) {
                 currentState = State.JUMPING;
@@ -415,6 +444,7 @@ public class Mario extends RigidBody {
             }
         }
 
+        stateTime = previousState == currentState ? stateTime + delta : 0;
 
         switch (currentState) {
             case DYING:
@@ -434,6 +464,9 @@ public class Mario extends RigidBody {
                     shrink = false;
                     defSmallMario();
                 }
+                break;
+            case CROUCHING:
+                setRegion(crouching);
                 break;
             case GROWING:
                 setRegion(growing.getKeyFrame(stateTime, false));
@@ -480,7 +513,6 @@ public class Mario extends RigidBody {
             facingRight = true;
         }
 
-        stateTime = previousState == currentState ? stateTime + delta : 0;
 
         if (body.getPosition().x < 0.5f) {
             body.setTransform(0.5f, body.getPosition().y, 0);
