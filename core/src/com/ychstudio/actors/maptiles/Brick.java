@@ -1,7 +1,7 @@
 package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -23,8 +23,8 @@ public class Brick extends MapTileObject {
     private Vector2 originalPosition;
     private Vector2 movablePosition;
 
-    public Brick(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
-        super(playScreen, x, y, textureRegion);
+    public Brick(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
+        super(playScreen, x, y, mapObject);
 
         originalPosition = new Vector2(x, y);
         movablePosition = new Vector2(x, y + 0.2f);
@@ -87,7 +87,7 @@ public class Brick extends MapTileObject {
             if (((Mario)other.getUserData()).isGrownUp()) {
                 hit = true;
                 GameManager.instance.getAssetManager().get("audio/sfx/breakblock.wav", Sound.class).play();
-
+                GameManager.instance.addScore(200);
                 queueDestroy();
             }
             else {

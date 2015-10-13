@@ -1,6 +1,7 @@
 package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -14,8 +15,8 @@ import com.ychstudio.screens.PlayScreen;
  */
 public class Rock extends MapTileObject {
 
-    public Rock(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
-        super(playScreen, x, y, textureRegion);
+    public Rock(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
+        super(playScreen, x, y, mapObject);
     }
 
     @Override

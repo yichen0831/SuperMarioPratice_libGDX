@@ -1,13 +1,14 @@
 package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.ychstudio.actors.Collider;
+import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -24,8 +25,8 @@ public class CoinBlock extends MapTileObject {
     private Vector2 originalPosition;
     private Vector2 movablePosition;
 
-    public CoinBlock(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
-        super(playScreen, x, y, textureRegion);
+    public CoinBlock(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
+        super(playScreen, x, y, mapObject);
 
         originalPosition = new Vector2(x, y);
         movablePosition = new Vector2(x, y + 0.2f);
@@ -79,7 +80,13 @@ public class CoinBlock extends MapTileObject {
                 hitable = false;
                 hit = true;
 
-                GameManager.instance.getAssetManager().get("audio/sfx/coin.wav", Sound.class).play();
+                if (mapObject.getProperties().containsKey("mushroom")) {
+                    playScreen.addSpawnItem(body.getPosition().x, body.getPosition().y + 16 / GameManager.PPM, Mushroom.class);
+                    GameManager.instance.getAssetManager().get("audio/sfx/powerup_spawn.wav", Sound.class).play();
+                }
+                else {
+                    GameManager.instance.getAssetManager().get("audio/sfx/coin.wav", Sound.class).play();
+                }
             }
             else {
                 GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();

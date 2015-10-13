@@ -34,7 +34,7 @@ public class WorldCreator {
             float x = ((TiledMapTileMapObject) mapObject).getX();
             float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new Rock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, ((TiledMapTileMapObject) mapObject).getTextureRegion()));
+            mapTileObjects.add(new Rock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
 
         }
 
@@ -43,7 +43,7 @@ public class WorldCreator {
             float x = ((TiledMapTileMapObject) mapObject).getX();
             float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new Pipe(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, ((TiledMapTileMapObject) mapObject).getTextureRegion()));
+            mapTileObjects.add(new Pipe(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
 
         }
 
@@ -52,7 +52,7 @@ public class WorldCreator {
             float x = ((TiledMapTileMapObject) mapObject).getX();
             float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new Brick(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, ((TiledMapTileMapObject) mapObject).getTextureRegion()));
+            mapTileObjects.add(new Brick(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
 
         }
 
@@ -61,7 +61,7 @@ public class WorldCreator {
             float x = ((TiledMapTileMapObject) mapObject).getX();
             float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new CoinBlock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, ((TiledMapTileMapObject) mapObject).getTextureRegion()));
+            mapTileObjects.add(new CoinBlock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
 
         }
 

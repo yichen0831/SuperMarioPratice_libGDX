@@ -119,7 +119,6 @@
  <objectgroup name="Bricks">
   <object id="33" gid="2" x="112" y="208" width="16" height="16"/>
   <object id="34" gid="2" x="128" y="208" width="16" height="16"/>
-  <object id="35" gid="2" x="144" y="208" width="16" height="16"/>
   <object id="36" gid="2" x="176" y="208" width="16" height="16"/>
   <object id="37" gid="2" x="160" y="208" width="16" height="16"/>
   <object id="51" gid="2" x="320" y="208" width="16" height="16"/>
@@ -141,7 +140,11 @@
   <object id="70" gid="2" x="720" y="144" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="CoinBlocks">
-  <object id="49" gid="25" x="304" y="208" width="16" height="16"/>
+  <object id="49" gid="25" x="304" y="208" width="16" height="16">
+   <properties>
+    <property name="mushroom" value=""/>
+   </properties>
+  </object>
   <object id="50" gid="25" x="352" y="208" width="16" height="16"/>
   <object id="53" gid="25" x="592" y="128" width="16" height="16"/>
   <object id="54" gid="25" x="544" y="128" width="16" height="16"/>

@@ -19,8 +19,8 @@ public class GameManager implements Disposable {
     public static final int WINDOW_WIDTH = 800;
     public static final int WINDOW_HEIGHT = 600;
 
-    public static final float V_WIDTH = 24.0f;
-    public static final float V_HEIGHT = 18.0f;
+    public static final float V_WIDTH = 20.0f;
+    public static final float V_HEIGHT = 15.0f;
 
     public static final Vector2 GRAVITY = new Vector2(0.0f, -9.8f * 4);
 
@@ -32,6 +32,7 @@ public class GameManager implements Disposable {
     public static final short MARIO_HEAD_BIT = 1 << 2;
     public static final short ENEMY_LETHAL_BIT = 1 << 3;
     public static final short ENEMY_WEAKNESS_BIT = 1 << 4;
+    public static final short ITEM_BIT = 1 << 5;
 
     private AssetManager assetManager;
 

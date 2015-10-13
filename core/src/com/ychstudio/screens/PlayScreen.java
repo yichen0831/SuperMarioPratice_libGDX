@@ -23,11 +23,16 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ychstudio.SuperMario;
 import com.ychstudio.actors.Mario;
 import com.ychstudio.actors.enemies.Enemy;
+import com.ychstudio.actors.items.Item;
+import com.ychstudio.actors.items.Mushroom;
+import com.ychstudio.actors.items.SpawningItem;
 import com.ychstudio.actors.maptiles.MapTileObject;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.hud.Hud;
 import com.ychstudio.utils.WorldContactListener;
 import com.ychstudio.utils.WorldCreator;
+
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Created by yichen on 10/11/15.
@@ -58,6 +63,9 @@ public class PlayScreen implements Screen {
 
     private Array<MapTileObject> mapTileObjects;
     private Array<Enemy> enemies;
+    private Array<Item> items;
+
+    private LinkedBlockingDeque<SpawningItem> itemSpawnQuque;
 
     private Mario mario;
 
@@ -94,7 +102,7 @@ public class PlayScreen implements Screen {
         viewport = new FitViewport(GameManager.V_WIDTH, GameManager.V_HEIGHT);
         viewport.setCamera(camera);
 
-        camera.position.set(GameManager.V_WIDTH / 2, GameManager.V_HEIGHT / 2, 0);
+        camera.position.set(GameManager.V_WIDTH / 2, GameManager.V_HEIGHT / 2 + 0.5f, 0);
 
         textureAtlas = new TextureAtlas("imgs/actors.atlas");
 
@@ -115,6 +123,10 @@ public class PlayScreen implements Screen {
         mapTileObjects = worldCreator.getMapTileObject();
         enemies = worldCreator.getEnemies();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
+
+        // for spawning
+        items = new Array<Item>();
+        itemSpawnQuque = new LinkedBlockingDeque<SpawningItem>();
 
         hud = new Hud(game.batch);
 
@@ -142,6 +154,21 @@ public class PlayScreen implements Screen {
 
     public float getMapHeight() {
         return mapHeight;
+    }
+
+    public void addSpawnItem(float x, float y, Class<? extends Item> type) {
+        itemSpawnQuque.add(new SpawningItem(x, y, type));
+    }
+
+    private void handleSpawningItem() {
+        if (itemSpawnQuque.size() > 0) {
+            SpawningItem spawningItem = itemSpawnQuque.poll();
+
+            if (spawningItem.type == Mushroom.class) {
+                items.add(new Mushroom(this, spawningItem.x, spawningItem.y));
+            }
+
+        }
     }
 
     public void handleInput() {
@@ -180,6 +207,7 @@ public class PlayScreen implements Screen {
         float step = GameManager.STEP * GameManager.timeScale;
 
         handleInput();
+        handleSpawningItem();
 
         // Box2D world step
         accumulator += delta;
@@ -196,6 +224,11 @@ public class PlayScreen implements Screen {
         // update enemies
         for (Enemy enemy : enemies) {
             enemy.update(delta);
+        }
+
+        // update items
+        for (Item item : items) {
+            item.update(delta);
         }
 
         // update Mario
@@ -257,6 +290,11 @@ public class PlayScreen implements Screen {
         // draw enemies
         for (Enemy enemy : enemies) {
             enemy.draw(game.batch);
+        }
+
+        // draw items
+        for (Item item : items) {
+            item.draw(game.batch);
         }
 
         // draw Mario

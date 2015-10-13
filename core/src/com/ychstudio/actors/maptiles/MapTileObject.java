@@ -1,6 +1,6 @@
 package com.ychstudio.actors.maptiles;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.ychstudio.actors.RigidBody;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -11,10 +11,15 @@ import com.ychstudio.screens.PlayScreen;
  * MapTileObject
  */
 public abstract class MapTileObject extends RigidBody {
-    public MapTileObject(PlayScreen playScreen, float x, float y, TextureRegion textureRegion) {
+
+    protected TiledMapTileMapObject mapObject;
+
+    public MapTileObject(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
         super(playScreen, x, y);
 
-        setRegion(textureRegion);
+        this.mapObject = mapObject;
+
+        setRegion(mapObject.getTextureRegion());
 
         float width = 16 / GameManager.PPM;
         float height = 16 / GameManager.PPM;

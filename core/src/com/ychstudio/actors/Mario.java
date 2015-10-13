@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.enemies.Enemy;
+import com.ychstudio.actors.items.Item;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -25,6 +26,8 @@ public class Mario extends RigidBody {
         RUNNING,
         JUMPING,
         FALLING,
+        GROWING,
+        DYING,
     }
 
     private final float radius = 6.8f / GameManager.PPM;
@@ -33,16 +36,26 @@ public class Mario extends RigidBody {
 
     private float stateTime;
 
-    private TextureRegion standing;
-    private TextureRegion jumping;
-    private Animation running;
+    private TextureRegion standingSmall;
+    private TextureRegion jumpingSmall;
+    private Animation runningSmall;
+
+    private Animation growing;
+    private TextureRegion dying;
+
+    private TextureRegion standingBig;
+    private TextureRegion jumpingBig;
+    private Animation runningBig;
 
     private boolean facingRight;
 
-    private boolean grownUp;
+    private boolean isGrownUp;
 
     private boolean grounded;
     private boolean jump;
+    private boolean die;
+    private boolean growUp;
+    private boolean shrink;
 
     private AssetManager assetManager;
 
@@ -50,24 +63,47 @@ public class Mario extends RigidBody {
         super(playScreen, x, y);
         TextureAtlas textureAtlas = playScreen.getTextureAtlas();
 
-        standing = new TextureRegion(textureAtlas.findRegion("Mario_small"), 0, 0, 16, 16);
-        jumping = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 5, 0, 16, 16);
+        standingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 0, 0, 16, 16);
+        standingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32);
 
+        jumpingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 5, 0, 16, 16);
+        jumpingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 5, 0, 16, 32);
+
+        // running animation
         Array<TextureRegion> keyFrames = new Array<TextureRegion>();
         for (int i = 1; i < 4; i++) {
             keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * i, 0, 16, 16));
         }
-        running = new Animation(0.1f, keyFrames);
+        runningSmall = new Animation(0.1f, keyFrames);
 
-        setRegion(standing);
+        keyFrames.clear();
+        for (int i = 1; i < 4; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * i, 0, 16, 32));
+        }
+        runningBig = new Animation(0.1f, keyFrames);
+
+        keyFrames.clear();
+        // growing up animation
+        for (int i = 0; i < 4; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 15, 0, 16, 32));
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32));
+        }
+        growing = new Animation(0.1f, keyFrames);
+
+        dying = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 6, 0, 16, 16);
+
+        setRegion(standingSmall);
         setBounds(getX(), getY(), 16 / GameManager.PPM, 16 / GameManager.PPM);
 
         currentState = State.STANDING;
         stateTime = 0;
 
         facingRight = true;
-        grownUp = false;
+        isGrownUp = false;
         jump = false;
+        die = false;
+        shrink = false;
+        growUp = false;
 
         assetManager = GameManager.instance.getAssetManager();
     }
@@ -90,18 +126,66 @@ public class Mario extends RigidBody {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = GameManager.MARIO_BIT;
-        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.ENEMY_WEAKNESS_BIT | GameManager.ENEMY_LETHAL_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.ENEMY_WEAKNESS_BIT | GameManager.ENEMY_LETHAL_BIT | GameManager.ITEM_BIT;
 
         body.createFixture(fixtureDef).setUserData(this);
 
         // Mario's feet
         EdgeShape edgeShape = new EdgeShape();
-        edgeShape.set(new Vector2(-radius / 2, -radius), new Vector2(radius / 2, -radius));
+        edgeShape.set(new Vector2(-radius, -radius), new Vector2(radius, -radius));
         fixtureDef.shape = edgeShape;
         body.createFixture(fixtureDef).setUserData(this);
 
         // Mario's head
         edgeShape.set(new Vector2(-radius / 6, radius), new Vector2(radius / 6, radius));
+        fixtureDef.shape = edgeShape;
+        fixtureDef.filter.categoryBits = GameManager.MARIO_HEAD_BIT;
+        fixtureDef.isSensor = true;
+
+        body.createFixture(fixtureDef).setUserData(this);
+
+        shape.dispose();
+        edgeShape.dispose();
+    }
+
+    private void defBigMario() {
+        Vector2 position = new Vector2(body.getPosition());
+
+        if (body != null) {
+            world.destroyBody(body);
+        }
+
+        BodyDef bodyDef = new BodyDef();
+
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(position.x, position.y);
+
+        body = world.createBody(bodyDef);
+
+        // Mario's body
+        CircleShape shape = new CircleShape();
+        shape.setRadius(radius);
+        shape.setPosition(new Vector2(0, 0));
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.filter.categoryBits = GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.ENEMY_WEAKNESS_BIT | GameManager.ENEMY_LETHAL_BIT | GameManager.ITEM_BIT;
+
+        body.createFixture(fixtureDef).setUserData(this);
+
+        shape.setPosition(new Vector2(0, radius * 2));
+        fixtureDef.shape = shape;
+        body.createFixture(fixtureDef).setUserData(this);
+
+        // Mario's feet
+        EdgeShape edgeShape = new EdgeShape();
+        edgeShape.set(new Vector2(-radius, -radius), new Vector2(radius, -radius));
+        fixtureDef.shape = edgeShape;
+        body.createFixture(fixtureDef).setUserData(this);
+
+        // Mario's head
+        edgeShape.set(new Vector2(-radius / 6, radius * 3), new Vector2(radius / 6, radius * 3));
         fixtureDef.shape = edgeShape;
         fixtureDef.filter.categoryBits = GameManager.MARIO_HEAD_BIT;
         fixtureDef.isSensor = true;
@@ -138,7 +222,7 @@ public class Mario extends RigidBody {
     }
 
     public boolean isGrownUp() {
-        return grownUp;
+        return isGrownUp;
     }
 
     private void checkGrounded() {
@@ -173,11 +257,22 @@ public class Mario extends RigidBody {
     @Override
     public void update(float delta) {
         checkGrounded();
-        handleInput();
+
+//        if (!die) {
+            handleInput();
+//        }
 
         State previousState = currentState;
 
-        if (!grounded) {
+        if (die) {
+            currentState = State.DYING;
+        }
+        else if (growUp) {
+            currentState = State.GROWING;
+            isGrownUp = true;
+            setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 32 / GameManager.PPM);
+        }
+        else if (!grounded) {
             if (jump) {
                 currentState = State.JUMPING;
             }
@@ -187,6 +282,9 @@ public class Mario extends RigidBody {
 
         }
         else {
+            if (currentState == State.JUMPING) {
+                jump = false;
+            }
             if (body.getLinearVelocity().x != 0) {
                 currentState = State.RUNNING;
             }
@@ -200,16 +298,41 @@ public class Mario extends RigidBody {
 
 
         switch (currentState) {
+            case DYING:
+                setRegion(dying);
+                break;
+            case GROWING:
+                setRegion(growing.getKeyFrame(stateTime, false));
+                if (growing.isAnimationFinished(stateTime)) {
+                    growUp = false;
+                    defBigMario();
+                }
+                break;
             case RUNNING:
-                setRegion(running.getKeyFrame(stateTime, true));
+                if (isGrownUp) {
+                    setRegion(runningBig.getKeyFrame(stateTime, true));
+                }
+                else {
+                    setRegion(runningSmall.getKeyFrame(stateTime, true));
+                }
                 break;
             case JUMPING:
-                setRegion(jumping);
+                if (isGrownUp) {
+                    setRegion(jumpingBig);
+                }
+                else {
+                    setRegion(jumpingSmall);
+                }
                 break;
             case FALLING:
             case STANDING:
             default:
-                setRegion(standing);
+                if (isGrownUp) {
+                    setRegion(standingBig);
+                }
+                else {
+                    setRegion(standingSmall);
+                }
                 break;
         }
 
@@ -234,7 +357,7 @@ public class Mario extends RigidBody {
             body.setLinearVelocity(0, body.getLinearVelocity().y);
         }
 
-        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+        setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - radius);
     }
 
     @Override
@@ -243,7 +366,30 @@ public class Mario extends RigidBody {
             ((Enemy) other.getUserData()).getDamage(1);
         }
         else if (other.getFilter().categoryBits == GameManager.ENEMY_LETHAL_BIT) {
-            System.out.println("Mario dies");
+
+            if (!isGrownUp) {
+                assetManager.get("audio/sfx/mariodie.wav", Sound.class).play();
+                die = true;
+            }
+            else {
+                assetManager.get("audio/sfx/powerdown.wav", Sound.class).play();
+                shrink = true;
+            }
+        }
+        else if (other.getFilter().categoryBits == GameManager.ITEM_BIT) {
+            Item item = (Item) other.getUserData();
+            item.use();
+            if (item.getName().equals("mushroom")) {
+                if (!isGrownUp) {
+                    assetManager.get("audio/sfx/powerup.wav", Sound.class).play();
+                    growUp = true;
+                }
+                else {
+                    assetManager.get("audio/sfx/stomp.wav", Sound.class).play();
+                }
+
+            }
+
         }
     }
 }

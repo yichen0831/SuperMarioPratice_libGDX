@@ -130,6 +130,7 @@ public class Goomba extends Enemy {
             stateTime = 0;
 
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.addScore(200);
             queueDestroy();
         }
     }
