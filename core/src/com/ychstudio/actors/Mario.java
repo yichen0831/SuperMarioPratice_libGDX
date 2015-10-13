@@ -33,6 +33,13 @@ public class Mario extends RigidBody {
 
     private final float radius = 6.8f / GameManager.PPM;
 
+    private final float normalForce = 20.0f;
+    private final float normalSpeedMax = 6.0f;
+    private final float fastForce = 36.0f;
+    private final float fastSpeedMax = 12.0f;
+
+    private float keyPressedTime;
+
     private State currentState;
 
     private float stateTime;
@@ -116,6 +123,8 @@ public class Mario extends RigidBody {
         die = false;
         shrink = false;
         growUp = false;
+
+        keyPressedTime = 99.0f;
 
         assetManager = GameManager.instance.getAssetManager();
     }
@@ -252,22 +261,44 @@ public class Mario extends RigidBody {
     }
 
     private void handleInput() {
+        float maxSpeed = normalSpeedMax;
+        float force = normalForce;
+        runningSmall.setFrameDuration(0.1f);
+        runningBig.setFrameDuration(0.1f);
 
-        // Jump
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && grounded) {
-            body.applyLinearImpulse(new Vector2(0.0f, 20.0f), body.getWorldCenter(), true);
-            assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
-            jump = true;
+        // Accelerate
+        if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
+            maxSpeed = fastSpeedMax;
+            force = fastForce;
+
+            runningSmall.setFrameDuration(0.05f);
+            runningBig.setFrameDuration(0.05f);
         }
 
+
+        // Jump
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.X)) && grounded) {
+            body.applyLinearImpulse(new Vector2(0.0f, 16.0f), body.getWorldCenter(), true);
+            assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
+            jump = true;
+            keyPressedTime = 0;
+        }
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.X)) && currentState == State.JUMPING) {
+            if (keyPressedTime > 0.1f && keyPressedTime < 0.15f) {
+                body.applyLinearImpulse(new Vector2(0.0f, 5.0f), body.getWorldCenter(), true);
+                keyPressedTime = 99.0f;
+            }
+        }
+
+
         // Move left
-        if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -10.0f) {
-            body.applyForceToCenter(new Vector2(-36.0f, 0.0f), true);
+        if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -maxSpeed) {
+            body.applyForceToCenter(new Vector2(-force, 0.0f), true);
         }
 
         // Move right
-        if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < 10.0f) {
-            body.applyForceToCenter(new Vector2(36.0f, 0.0f), true);
+        if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < maxSpeed) {
+            body.applyForceToCenter(new Vector2(force, 0.0f), true);
         }
 
     }
@@ -323,6 +354,7 @@ public class Mario extends RigidBody {
         }
 
         if (!isDead) {
+            keyPressedTime += delta;
             handleInput();
         }
 
