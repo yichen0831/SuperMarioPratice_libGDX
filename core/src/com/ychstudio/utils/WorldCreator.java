@@ -6,6 +6,8 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.ychstudio.actors.enemies.Enemy;
+import com.ychstudio.actors.enemies.Goomba;
 import com.ychstudio.actors.maptiles.*;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -18,12 +20,14 @@ import com.ychstudio.screens.PlayScreen;
 public class WorldCreator {
 
     private Array<MapTileObject> mapTileObjects;
+    private Array<Enemy> enemies;
 
     private Vector2 startPosition;
 
     public WorldCreator(PlayScreen playScreen, TiledMap tiledMap) {
 
         mapTileObjects = new Array<MapTileObject>();
+        enemies = new Array<Enemy>();
 
         MapLayer mapLayer = tiledMap.getLayers().get("Rocks");
         for (MapObject mapObject : mapLayer.getObjects()) {
@@ -61,6 +65,15 @@ public class WorldCreator {
 
         }
 
+        mapLayer = tiledMap.getLayers().get("Goombas");
+        for (MapObject mapObject : mapLayer.getObjects()) {
+            float x = ((TiledMapTileMapObject) mapObject).getX();
+            float y = ((TiledMapTileMapObject) mapObject).getY();
+
+            enemies.add(new Goomba(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM));
+
+        }
+
         startPosition = new Vector2(2.0f, 2.0f);
 
         mapLayer = tiledMap.getLayers().get("Start");
@@ -79,5 +92,9 @@ public class WorldCreator {
 
     public Array<MapTileObject> getMapTileObject() {
         return mapTileObjects;
+    }
+
+    public Array<Enemy> getEnemies() {
+        return enemies;
     }
 }

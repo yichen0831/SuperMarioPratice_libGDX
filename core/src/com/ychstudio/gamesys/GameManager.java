@@ -1,6 +1,7 @@
 package com.ychstudio.gamesys;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 
@@ -25,13 +26,18 @@ public class GameManager implements Disposable {
 
     public static final float STEP = 1 / 60.0f;
 
+
     public static final short GROUND_BIT = 1;
     public static final short MARIO_BIT = 1 << 1;
     public static final short MARIO_HEAD_BIT = 1 << 2;
+    public static final short ENEMY_LETHAL_BIT = 1 << 3;
+    public static final short ENEMY_WEAKNESS_BIT = 1 << 4;
 
     private AssetManager assetManager;
 
     private int score;
+    public static float timeScale = 1;
+
 
     public GameManager() {
         if (instance == null) {
@@ -55,6 +61,10 @@ public class GameManager implements Disposable {
 
     public void addScore(int value) {
         score += value;
+    }
+
+    public static void setTimeScale(float value) {
+        timeScale = MathUtils.clamp(value, 0.0f, 2.0f);
     }
 
     public AssetManager getAssetManager() {

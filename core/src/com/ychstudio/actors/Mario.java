@@ -7,10 +7,10 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -90,14 +90,14 @@ public class Mario extends RigidBody {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = GameManager.MARIO_BIT;
-        fixtureDef.filter.maskBits = GameManager.GROUND_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.ENEMY_WEAKNESS_BIT | GameManager.ENEMY_LETHAL_BIT;
 
         body.createFixture(fixtureDef).setUserData(this);
 
         // Mario's feet
         EdgeShape edgeShape = new EdgeShape();
-        fixtureDef.shape = edgeShape;
         edgeShape.set(new Vector2(-radius / 2, -radius), new Vector2(radius / 2, -radius));
+        fixtureDef.shape = edgeShape;
         body.createFixture(fixtureDef).setUserData(this);
 
         // Mario's head
@@ -116,7 +116,7 @@ public class Mario extends RigidBody {
 
         // Jump
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && grounded) {
-            body.applyLinearImpulse(new Vector2(0.0f, 20.0f), body.getLocalCenter(), true);
+            body.applyLinearImpulse(new Vector2(0.0f, 20.0f), body.getWorldCenter(), true);
             assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
             jump = true;
         }
@@ -139,11 +139,6 @@ public class Mario extends RigidBody {
 
     public boolean isGrownUp() {
         return grownUp;
-    }
-
-    public boolean canJump() {
-        checkGrounded();
-        return grounded;
     }
 
     private void checkGrounded() {
@@ -240,12 +235,15 @@ public class Mario extends RigidBody {
         }
 
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
-
     }
 
     @Override
     public void onCollide(Collider other) {
-
-//        System.out.println("I collided with " + other.getFilterData().categoryBits);
+        if (other.getFilter().categoryBits == GameManager.ENEMY_WEAKNESS_BIT) {
+            ((Enemy) other.getUserData()).getDamage(1);
+        }
+        else if (other.getFilter().categoryBits == GameManager.ENEMY_LETHAL_BIT) {
+            System.out.println("Mario dies");
+        }
     }
 }

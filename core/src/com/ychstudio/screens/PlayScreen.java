@@ -14,6 +14,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ychstudio.SuperMario;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.maptiles.MapTileObject;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.hud.Hud;
@@ -55,6 +57,7 @@ public class PlayScreen implements Screen {
     private boolean renderB2DDebug;
 
     private Array<MapTileObject> mapTileObjects;
+    private Array<Enemy> enemies;
 
     private Mario mario;
 
@@ -95,6 +98,11 @@ public class PlayScreen implements Screen {
 
         textureAtlas = new TextureAtlas("imgs/actors.atlas");
 
+        // create Box2D world
+        world = new World(GameManager.GRAVITY, true);
+        world.setContactListener(new WorldContactListener());
+
+        // load tmx tiled map
         TmxMapLoader tmxMapLoader = new TmxMapLoader();
         tiledMap = tmxMapLoader.load("maps/Level_01.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1 / GameManager.PPM);
@@ -102,11 +110,10 @@ public class PlayScreen implements Screen {
         mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();
         mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight();
 
-        world = new World(GameManager.GRAVITY, true);
-        world.setContactListener(new WorldContactListener());
-
+        // create world from TmxTiledMap
         WorldCreator worldCreator = new WorldCreator(this, tiledMap);
         mapTileObjects = worldCreator.getMapTileObject();
+        enemies = worldCreator.getEnemies();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
 
         hud = new Hud(game.batch);
@@ -152,23 +159,50 @@ public class PlayScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
             renderB2DDebug = !renderB2DDebug;
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT_BRACKET)) {
+            float timeScale = GameManager.timeScale;
+            GameManager.setTimeScale(timeScale - 0.2f);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT_BRACKET)) {
+            float timeScale = GameManager.timeScale;
+            GameManager.setTimeScale(timeScale + 0.2f);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.EQUALS)) {
+            GameManager.setTimeScale(1.0f);
+        }
     }
 
     public void update(float delta) {
+        delta *= GameManager.timeScale;
+        float step = GameManager.STEP * GameManager.timeScale;
+
         handleInput();
 
+        // Box2D world step
         accumulator += delta;
-        if (accumulator > GameManager.STEP) {
-            world.step(GameManager.STEP, 6, 2);
-            accumulator -= GameManager.STEP;
+        if (accumulator > step) {
+            world.step(step, 6, 2);
+            accumulator -= step;
         }
 
+        // update map tile objects
         for (MapTileObject mapTileObject : mapTileObjects) {
             mapTileObject.update(delta);
         }
 
+        // update enemies
+        for (Enemy enemy : enemies) {
+            enemy.update(delta);
+        }
+
+        // update Mario
         mario.update(delta);
 
+
+        // camera control
         float targetX = mario.getPosition().x;
 
         if (targetX < GameManager.V_WIDTH / 2) {
@@ -181,8 +215,10 @@ public class PlayScreen implements Screen {
         camera.position.x = MathUtils.lerp(camera.position.x, targetX, 0.1f);
         camera.update();
 
+        // update map renderer
         mapRenderer.setView(camera);
 
+        // update HUD
         hud.update(delta);
 
 //        cleanUpDestroyedObjects(); // do not need to clean yet as performance concerns
@@ -196,6 +232,10 @@ public class PlayScreen implements Screen {
         }
     }
 
+    public Vector2 getMarioPosition() {
+        return mario.getPosition();
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -203,15 +243,23 @@ public class PlayScreen implements Screen {
 
         update(delta);
 
+        // draw map
         mapRenderer.render(new int[] {0, 1});
 
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
 
+        // draw map tile objects
         for (MapTileObject mapTileObject : mapTileObjects) {
             mapTileObject.draw(game.batch);
         }
 
+        // draw enemies
+        for (Enemy enemy : enemies) {
+            enemy.draw(game.batch);
+        }
+
+        // draw Mario
         mario.draw(game.batch);
 
         game.batch.end();
