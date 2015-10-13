@@ -1,5 +1,6 @@
 package com.ychstudio.actors.enemies;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -90,20 +91,27 @@ public class Goomba extends Enemy {
         stateTime += delta;
 
         if (toBeDestroyed) {
-            destroyed = true;
-        }
 
-        checkMovingDirection();
+            setRegion(new TextureRegion(playScreen.getTextureAtlas().findRegion("Goomba"), 16 * 2, 0, 16, 16));
 
-        float velocityY = body.getLinearVelocity().y;
-        if (movingRight) {
-            body.setLinearVelocity(new Vector2(speed, velocityY));
+            if (stateTime > 1.0f) {
+                world.destroyBody(body);
+                setBounds(0, 0, 0, 0);
+                destroyed = true;
+            }
         }
         else {
-            body.setLinearVelocity(new Vector2(-speed, velocityY));
-        }
+            setRegion(walking.getKeyFrame(stateTime, true));
+            checkMovingDirection();
 
-        setRegion(walking.getKeyFrame(stateTime, true));
+            float velocityY = body.getLinearVelocity().y;
+            if (movingRight) {
+                body.setLinearVelocity(new Vector2(speed, velocityY));
+            }
+            else {
+                body.setLinearVelocity(new Vector2(-speed, velocityY));
+            }
+        }
 
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
     }
@@ -119,7 +127,10 @@ public class Goomba extends Enemy {
             for (Fixture fixture : body.getFixtureList()) {
                 fixture.setFilterData(filter);
             }
-//            queueDestroy();
+            stateTime = 0;
+
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            queueDestroy();
         }
     }
 
@@ -136,27 +147,21 @@ public class Goomba extends Enemy {
         // feet
         EdgeShape edgeShape = new EdgeShape();
         edgeShape.set(
-                new Vector2(-6.0f, -7.0f).scl(1 / GameManager.PPM),
-                new Vector2(6.0f, -7.0f).scl(1 / GameManager.PPM)
+                new Vector2(-7.0f, -7.0f).scl(1 / GameManager.PPM),
+                new Vector2(7.0f, -7.0f).scl(1 / GameManager.PPM)
                 );
 
         fixtureDef.shape = edgeShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_LETHAL_BIT;
-        fixtureDef.filter.maskBits = GameManager.GROUND_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.MARIO_BIT;
         body.createFixture(fixtureDef).setUserData(this);
 
-        Vector2[] vertices = {
-                new Vector2(-6.8f, 8.0f).scl(1 / GameManager.PPM),
-                new Vector2(6.8f, 8.0f).scl(1 / GameManager.PPM),
-                new Vector2(-2.0f, -4.0f).scl(1 / GameManager.PPM),
-                new Vector2(2.0f, -4.0f).scl(1 / GameManager.PPM),
-        };
 
         // lethal
         CircleShape circleShape = new CircleShape();
         circleShape.setRadius(2.0f / GameManager.PPM);
         circleShape.setPosition(new Vector2(-6, 0).scl(1 / GameManager.PPM));
-        
+
         fixtureDef.shape = circleShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_LETHAL_BIT;
         fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
@@ -166,6 +171,12 @@ public class Goomba extends Enemy {
         body.createFixture(fixtureDef).setUserData(this);
 
         // weakness
+        Vector2[] vertices = {
+                new Vector2(-6.8f, 7.0f).scl(1 / GameManager.PPM),
+                new Vector2(6.8f, 7.0f).scl(1 / GameManager.PPM),
+                new Vector2(-2.0f, -2.0f).scl(1 / GameManager.PPM),
+                new Vector2(2.0f, -2.0f).scl(1 / GameManager.PPM),
+        };
         PolygonShape polygonShape = new PolygonShape();
         polygonShape.set(vertices);
 
