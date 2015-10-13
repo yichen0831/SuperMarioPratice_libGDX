@@ -102,7 +102,7 @@ public class PlayScreen implements Screen {
         viewport = new FitViewport(GameManager.V_WIDTH, GameManager.V_HEIGHT);
         viewport.setCamera(camera);
 
-        camera.position.set(GameManager.V_WIDTH / 2, GameManager.V_HEIGHT / 2 + 0.5f, 0);
+        camera.position.set(GameManager.V_WIDTH / 2, GameManager.V_HEIGHT / 2, 0);
 
         textureAtlas = new TextureAtlas("imgs/actors.atlas");
 
@@ -112,7 +112,7 @@ public class PlayScreen implements Screen {
 
         // load tmx tiled map
         TmxMapLoader tmxMapLoader = new TmxMapLoader();
-        tiledMap = tmxMapLoader.load("maps/Level_01.tmx");
+        tiledMap = tmxMapLoader.load("maps/Level_1-1.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1 / GameManager.PPM);
 
         mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();

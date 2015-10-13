@@ -22,7 +22,7 @@ public class Mushroom extends Item {
         setRegion(new TextureRegion(playScreen.getTextureAtlas().findRegion("Mushroom"), 0, 0, 16, 16));
         setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 16 / GameManager.PPM);
 
-        movingRight = false;
+        movingRight = true;
         speed = 2.0f;
 
         name = "mushroom";

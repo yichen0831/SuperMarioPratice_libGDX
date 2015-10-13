@@ -1,12 +1,15 @@
 package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.Collider;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.gamesys.GameManager;
@@ -25,14 +28,31 @@ public class CoinBlock extends MapTileObject {
     private Vector2 originalPosition;
     private Vector2 movablePosition;
 
+    private TextureRegion unhitableTextureRegion;
+    private Animation flashingAnimation;
+
+    private float stateTimer;
+
     public CoinBlock(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
         super(playScreen, x, y, mapObject);
+
+        TiledMap tiledMap = playScreen.getTiledMap();
+        unhitableTextureRegion = tiledMap.getTileSets().getTileSet(0).getTile(28).getTextureRegion();
+
+        Array<TextureRegion> keyFrames = new Array<TextureRegion>();
+
+        for (int i = 25; i < 28; i++) {
+            keyFrames.add(tiledMap.getTileSets().getTileSet(0).getTile(i).getTextureRegion());
+        }
+        flashingAnimation = new Animation(0.3f, keyFrames);
 
         originalPosition = new Vector2(x, y);
         movablePosition = new Vector2(x, y + 0.2f);
 
         hitable = true;
         hit = false;
+
+        stateTimer = 0;
     }
 
     @Override
@@ -58,6 +78,14 @@ public class CoinBlock extends MapTileObject {
 
     @Override
     public void update(float delta) {
+        stateTimer += delta;
+        if (hitable) {
+            setRegion(flashingAnimation.getKeyFrame(stateTimer, true));
+        }
+        else {
+            setRegion(unhitableTextureRegion);
+        }
+
         if (hit) {
             body.setTransform(movablePosition.x, movablePosition.y, 0);
             hit = false;
@@ -73,8 +101,6 @@ public class CoinBlock extends MapTileObject {
     public void onTrigger(Collider other) {
         if (other.getFilter().categoryBits == GameManager.MARIO_HEAD_BIT) {
             if (hitable) {
-                TiledMap tiledMap = playScreen.getTiledMap();
-                setRegion(tiledMap.getTileSets().getTileSet(0).getTile(28).getTextureRegion());
 
                 GameManager.instance.addScore(200);
                 hitable = false;

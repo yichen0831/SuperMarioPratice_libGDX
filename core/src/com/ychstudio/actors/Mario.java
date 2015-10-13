@@ -373,7 +373,7 @@ public class Mario extends RigidBody {
         checkGrounded();
 
         // die when falling below ground
-        if (body.getPosition().y < -0.5f) {
+        if (body.getPosition().y < -2.0f) {
             die = true;
         }
 

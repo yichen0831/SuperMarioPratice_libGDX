@@ -30,58 +30,65 @@ public class WorldCreator {
         enemies = new Array<Enemy>();
 
         MapLayer mapLayer = tiledMap.getLayers().get("Rocks");
-        for (MapObject mapObject : mapLayer.getObjects()) {
-            float x = ((TiledMapTileMapObject) mapObject).getX();
-            float y = ((TiledMapTileMapObject) mapObject).getY();
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new Rock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
-
+                mapTileObjects.add(new Rock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
+            }
         }
 
         mapLayer = tiledMap.getLayers().get("Pipes");
-        for (MapObject mapObject : mapLayer.getObjects()) {
-            float x = ((TiledMapTileMapObject) mapObject).getX();
-            float y = ((TiledMapTileMapObject) mapObject).getY();
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new Pipe(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
-
+                mapTileObjects.add(new Pipe(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
+            }
         }
 
         mapLayer = tiledMap.getLayers().get("Bricks");
-        for (MapObject mapObject : mapLayer.getObjects()) {
-            float x = ((TiledMapTileMapObject) mapObject).getX();
-            float y = ((TiledMapTileMapObject) mapObject).getY();
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new Brick(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
-
+                mapTileObjects.add(new Brick(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
+            }
         }
 
         mapLayer = tiledMap.getLayers().get("CoinBlocks");
-        for (MapObject mapObject : mapLayer.getObjects()) {
-            float x = ((TiledMapTileMapObject) mapObject).getX();
-            float y = ((TiledMapTileMapObject) mapObject).getY();
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            mapTileObjects.add(new CoinBlock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
-
+                mapTileObjects.add(new CoinBlock(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
+            }
         }
 
         mapLayer = tiledMap.getLayers().get("Goombas");
-        for (MapObject mapObject : mapLayer.getObjects()) {
-            float x = ((TiledMapTileMapObject) mapObject).getX();
-            float y = ((TiledMapTileMapObject) mapObject).getY();
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
 
-            enemies.add(new Goomba(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM));
-
+                enemies.add(new Goomba(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM));
+            }
         }
 
-        startPosition = new Vector2(2.0f, 2.0f);
+        startPosition = new Vector2(64.0f, 64.0f);
 
         mapLayer = tiledMap.getLayers().get("Start");
-        if (mapLayer.getObjects().getCount() > 0) {
-            float x = ((TiledMapTileMapObject) mapLayer.getObjects().get(0)).getX();
-            float y = ((TiledMapTileMapObject) mapLayer.getObjects().get(0)).getY();
+        if (mapLayer != null) {
+            if (mapLayer.getObjects().getCount() > 0) {
+                float x = ((TiledMapTileMapObject) mapLayer.getObjects().get(0)).getX();
+                float y = ((TiledMapTileMapObject) mapLayer.getObjects().get(0)).getY();
 
-            startPosition = new Vector2(x, y);
+                startPosition = new Vector2(x, y);
+            }
         }
 
     }
