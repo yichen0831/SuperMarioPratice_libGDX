@@ -22,14 +22,9 @@ public class Hud implements Disposable {
     private Stage stage;
 
     private int time;
-    private int level;
-
-    private Label scoreTextLabel;
-    private Label timeTextLabel;
-    private Label levelTextLabel;
 
     private Label scoreLabel;
-    private Label timeLable;
+    private Label timeLabel;
     private Label levelLabel;
 
     private float accumulator;
@@ -40,15 +35,18 @@ public class Hud implements Disposable {
         stage = new Stage(viewport, batch);
 
         time = 300;
-        level = 1;
+
+        Label scoreTextLabel;
+        Label timeTextLabel;
+        Label levelTextLabel;
 
         scoreTextLabel = new Label("SCORE", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         timeTextLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelTextLabel = new Label("LEVEL", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timeLable = new Label(String.format("%03d", time), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        levelLabel = new Label(String.format("%02d", level), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        timeLabel = new Label(String.format("%03d", time), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        levelLabel = new Label("1-1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         Table table = new Table();
         table.top();
@@ -62,11 +60,15 @@ public class Hud implements Disposable {
 
         table.add(scoreLabel).expandX();
         table.add(levelLabel).expandX();
-        table.add(timeLable).expandX();
+        table.add(timeLabel).expandX();
 
         stage.addActor(table);
 
         accumulator = 0;
+    }
+
+    public void setLevel(String level) {
+        levelLabel.setText(level);
     }
 
     public void draw() {
@@ -80,7 +82,7 @@ public class Hud implements Disposable {
         if (accumulator > 1.0f) {
             time -= 1;
             accumulator -= 1.0f;
-            timeLable.setText(String.format("%03d", time));
+            timeLabel.setText(String.format("%03d", time));
         }
     }
 

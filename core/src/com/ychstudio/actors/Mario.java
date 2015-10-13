@@ -289,7 +289,7 @@ public class Mario extends RigidBody {
             jump = true;
             keyPressedTime = 0;
         }
-        if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.X)) && currentState == State.JUMPING) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.X)) && currentState == State.JUMPING) {
             if (keyPressedTime > 0.1f && keyPressedTime < 0.15f) {
                 body.applyLinearImpulse(new Vector2(0.0f, 5.0f), body.getWorldCenter(), true);
                 keyPressedTime = 99.0f;

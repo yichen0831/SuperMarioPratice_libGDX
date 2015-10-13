@@ -129,6 +129,7 @@ public class PlayScreen implements Screen {
         itemSpawnQuque = new LinkedBlockingDeque<SpawningItem>();
 
         hud = new Hud(game.batch);
+        hud.setLevel("1-1");
 
         accumulator = 0;
 
