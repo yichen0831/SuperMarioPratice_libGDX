@@ -19,6 +19,8 @@ import com.ychstudio.gamesys.GameManager;
  */
 public class Hud implements Disposable {
 
+    private SpriteBatch batch;
+
     private Stage stage;
 
     private int time;
@@ -27,9 +29,14 @@ public class Hud implements Disposable {
     private Label timeLabel;
     private Label levelLabel;
 
+    private boolean showFPS;
+    private Label fpsLabel;
+
+    private float fpsTimeAccumulator;
     private float accumulator;
 
     public Hud(SpriteBatch batch) {
+        this.batch = batch;
 
         Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 2, GameManager.WINDOW_HEIGHT / 2, new OrthographicCamera());
         stage = new Stage(viewport, batch);
@@ -48,6 +55,9 @@ public class Hud implements Disposable {
         timeLabel = new Label(String.format("%03d", time), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelLabel = new Label("1-1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
+        fpsLabel = new Label("FPS:    ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        fpsLabel.setPosition(6f, 6f);
+
         Table table = new Table();
         table.top();
         table.setFillParent(true);
@@ -65,25 +75,51 @@ public class Hud implements Disposable {
         stage.addActor(table);
 
         accumulator = 0;
+        fpsTimeAccumulator = 0;
+        showFPS = false;
     }
 
     public void setLevel(String level) {
         levelLabel.setText(level);
     }
 
+    public boolean isShowFPS() {
+        return showFPS;
+    }
+
+    public void setShowFPS(boolean value) {
+        showFPS = value;
+    }
+
     public void draw() {
         scoreLabel.setText(String.format("%06d", GameManager.instance.getScore()));
         stage.draw();
+
+        if (showFPS) {
+            batch.begin();
+            fpsLabel.draw(batch, 1.0f);
+            batch.end();
+        }
     }
 
     public void update(float delta) {
         accumulator += delta;
+
+        if (showFPS) {
+            fpsTimeAccumulator += delta;
+            if (fpsTimeAccumulator > 0.2) {
+                fpsLabel.setText(String.format("FPS: %3d", (int) (1 / delta * GameManager.timeScale)));
+                fpsTimeAccumulator = 0;
+            }
+        }
 
         if (accumulator > 1.0f) {
             time -= 1;
             accumulator -= 1.0f;
             timeLabel.setText(String.format("%03d", time));
         }
+
+
     }
 
     @Override

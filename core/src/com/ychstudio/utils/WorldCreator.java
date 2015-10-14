@@ -39,6 +39,16 @@ public class WorldCreator {
             }
         }
 
+        mapLayer = tiledMap.getLayers().get("MetalBlocks");
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
+
+                mapTileObjects.add(new Pipe(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
+            }
+        }
+
         mapLayer = tiledMap.getLayers().get("Pipes");
         if (mapLayer != null) {
             for (MapObject mapObject : mapLayer.getObjects()) {
@@ -78,6 +88,17 @@ public class WorldCreator {
                 enemies.add(new Goomba(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM));
             }
         }
+
+        mapLayer = tiledMap.getLayers().get("Flagpole");
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
+
+                mapTileObjects.add(new Flagpole(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM, (TiledMapTileMapObject) mapObject));
+            }
+        }
+
 
         startPosition = new Vector2(64.0f, 64.0f);
 

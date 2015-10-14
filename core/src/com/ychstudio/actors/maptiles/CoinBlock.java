@@ -44,7 +44,8 @@ public class CoinBlock extends MapTileObject {
         for (int i = 25; i < 28; i++) {
             keyFrames.add(tiledMap.getTileSets().getTileSet(0).getTile(i).getTextureRegion());
         }
-        flashingAnimation = new Animation(0.3f, keyFrames);
+        keyFrames.add(tiledMap.getTileSets().getTileSet(0).getTile(26).getTextureRegion());
+        flashingAnimation = new Animation(0.2f, keyFrames);
 
         originalPosition = new Vector2(x, y);
         movablePosition = new Vector2(x, y + 0.2f);

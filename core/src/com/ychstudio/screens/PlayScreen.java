@@ -188,6 +188,11 @@ public class PlayScreen implements Screen {
             renderB2DDebug = !renderB2DDebug;
         }
 
+        // Press F to toggle show FPS
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
+            hud.setShowFPS(!hud.isShowFPS());
+        }
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT_BRACKET)) {
             float timeScale = GameManager.timeScale;
             GameManager.setTimeScale(timeScale - 0.2f);
