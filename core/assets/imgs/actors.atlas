@@ -38,7 +38,7 @@ Star
   orig: 64, 16
   offset: 0, 0
   index: -1
-FlipingCoin
+FlippingCoin
   rotate: false
   xy: 293, 3
   size: 64, 16

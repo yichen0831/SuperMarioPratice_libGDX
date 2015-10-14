@@ -22,6 +22,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ychstudio.SuperMario;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.effects.Effect;
+import com.ychstudio.actors.effects.FlippingCoin;
+import com.ychstudio.actors.effects.SpawningEffect;
 import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.items.Item;
 import com.ychstudio.actors.items.Mushroom;
@@ -63,9 +66,12 @@ public class PlayScreen implements Screen {
 
     private Array<MapTileObject> mapTileObjects;
     private Array<Enemy> enemies;
-    private Array<Item> items;
 
+    private Array<Item> items;
     private LinkedBlockingDeque<SpawningItem> itemSpawnQuque;
+
+    private Array<Effect> effects;
+    private LinkedBlockingDeque<SpawningEffect> effectSpawnQueue;
 
     private Mario mario;
 
@@ -124,9 +130,13 @@ public class PlayScreen implements Screen {
         enemies = worldCreator.getEnemies();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
 
-        // for spawning
+        // for spawning item
         items = new Array<Item>();
         itemSpawnQuque = new LinkedBlockingDeque<SpawningItem>();
+
+        // for spawning effect
+        effects = new Array<Effect>();
+        effectSpawnQueue = new LinkedBlockingDeque<SpawningEffect>();
 
         hud = new Hud(game.batch);
         hud.setLevel("1-1");
@@ -169,6 +179,20 @@ public class PlayScreen implements Screen {
                 items.add(new Mushroom(this, spawningItem.x, spawningItem.y));
             }
 
+        }
+    }
+
+    public void addSpawnEffect(float x, float y, Class<? extends Effect> type) {
+        effectSpawnQueue.add(new SpawningEffect(x, y, type));
+    }
+
+    public void handleSpawningEffect() {
+        if (effectSpawnQueue.size() > 0) {
+            SpawningEffect spawningEffect = effectSpawnQueue.poll();
+
+            if (spawningEffect.type == FlippingCoin.class) {
+                effects.add(new FlippingCoin(this, spawningEffect.x, spawningEffect.y));
+            }
         }
     }
 
@@ -220,6 +244,7 @@ public class PlayScreen implements Screen {
 
         handleInput();
         handleSpawningItem();
+        handleSpawningEffect();
         handleMusic();
 
         // Box2D world step
@@ -242,6 +267,11 @@ public class PlayScreen implements Screen {
         // update items
         for (Item item : items) {
             item.update(delta);
+        }
+
+        // update effects
+        for (Effect effect : effects) {
+            effect.update(delta);
         }
 
         // update Mario
@@ -278,6 +308,18 @@ public class PlayScreen implements Screen {
                 mapTileObjects.removeIndex(i);
             }
         }
+
+        for (int i = 0; i < items.size; i++) {
+            if (items.get(i).isDestroyed()) {
+                items.removeIndex(i);
+            }
+        }
+
+        for (int i = 0; i < effects.size; i++) {
+            if (effects.get(i).isDestroyed()) {
+                effects.removeIndex(i);
+            }
+        }
     }
 
     public Vector2 getMarioPosition() {
@@ -310,6 +352,11 @@ public class PlayScreen implements Screen {
         // draw items
         for (Item item : items) {
             item.draw(game.batch);
+        }
+
+        // draw effects
+        for (Effect effect : effects) {
+            effect.draw(game.batch);
         }
 
         // draw Mario

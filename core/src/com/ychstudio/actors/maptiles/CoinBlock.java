@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.Collider;
+import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -122,6 +123,7 @@ public class CoinBlock extends MapTileObject {
                     GameManager.instance.getAssetManager().get("audio/sfx/powerup_spawn.wav", Sound.class).play();
                 }
                 else {
+                    playScreen.addSpawnEffect(body.getPosition().x, body.getPosition().y + 1.0f, FlippingCoin.class);
                     GameManager.instance.getAssetManager().get("audio/sfx/coin.wav", Sound.class).play();
                 }
             }
