@@ -2,6 +2,7 @@ package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -23,11 +24,15 @@ public class Brick extends MapTileObject {
     private Vector2 originalPosition;
     private Vector2 movablePosition;
 
+    private Vector2 targetPosition;
+
     public Brick(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
         super(playScreen, x, y, mapObject);
 
         originalPosition = new Vector2(x, y);
         movablePosition = new Vector2(x, y + 0.2f);
+
+        targetPosition = originalPosition;
 
         hit = false;
     }
@@ -59,19 +64,23 @@ public class Brick extends MapTileObject {
             return;
         }
 
+        if (toBeDestroyed) {
+            setBounds(0, 0, 0, 0);
+            world.destroyBody(body);
+            destroyed = true;
+            return;
+        }
 
-        if (hit) {
-            body.setTransform(movablePosition.x, movablePosition.y, 0);
-            hit = false;
+        float x = body.getPosition().x;
+        float y = body.getPosition().y;
+        if (Math.abs(y - targetPosition.y) > 0.01f) {
+            y = MathUtils.lerp(y, targetPosition.y, 0.6f);
+            body.setTransform(x, y, 0);
         }
         else {
-            body.setTransform(originalPosition.x, originalPosition.y, 0);
-
-            if (toBeDestroyed) {
-                setBounds(0, 0, 0, 0);
-                world.destroyBody(body);
-                destroyed = true;
-                return;
+            if (hit) {
+                hit = false;
+                targetPosition = originalPosition;
             }
         }
 
@@ -83,6 +92,7 @@ public class Brick extends MapTileObject {
     public void onTrigger(Collider other) {
 
         if (other.getFilter().categoryBits == GameManager.MARIO_HEAD_BIT) {
+            targetPosition = movablePosition;
 
             if (((Mario)other.getUserData()).isGrownUp()) {
                 hit = true;

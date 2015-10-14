@@ -620,6 +620,6 @@
   <object id="502" gid="298" x="2576" y="208" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Start">
-  <object id="603" gid="64" x="2752" y="208" width="16" height="16"/>
+  <object id="603" gid="64" x="96" y="208" width="16" height="16"/>
  </objectgroup>
 </map>

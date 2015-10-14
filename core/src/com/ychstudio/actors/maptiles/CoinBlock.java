@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -27,6 +28,7 @@ public class CoinBlock extends MapTileObject {
 
     private Vector2 originalPosition;
     private Vector2 movablePosition;
+    private Vector2 targetPosition;
 
     private TextureRegion unhitableTextureRegion;
     private Animation flashingAnimation;
@@ -49,6 +51,7 @@ public class CoinBlock extends MapTileObject {
 
         originalPosition = new Vector2(x, y);
         movablePosition = new Vector2(x, y + 0.2f);
+        targetPosition = originalPosition;
 
         hitable = true;
         hit = false;
@@ -87,12 +90,18 @@ public class CoinBlock extends MapTileObject {
             setRegion(unhitableTextureRegion);
         }
 
-        if (hit) {
-            body.setTransform(movablePosition.x, movablePosition.y, 0);
-            hit = false;
+
+        float x = body.getPosition().x;
+        float y = body.getPosition().y;
+        if (Math.abs(y - targetPosition.y) > 0.01f) {
+            y = MathUtils.lerp(y, targetPosition.y, 0.6f);
+            body.setTransform(x, y, 0);
         }
         else {
-            body.setTransform(originalPosition.x, originalPosition.y, 0);
+            if (hit) {
+                hit = false;
+                targetPosition = originalPosition;
+            }
         }
 
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
@@ -106,6 +115,7 @@ public class CoinBlock extends MapTileObject {
                 GameManager.instance.addScore(200);
                 hitable = false;
                 hit = true;
+                targetPosition = movablePosition;
 
                 if (mapObject.getProperties().containsKey("mushroom")) {
                     playScreen.addSpawnItem(body.getPosition().x, body.getPosition().y + 16 / GameManager.PPM, Mushroom.class);

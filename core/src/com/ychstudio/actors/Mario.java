@@ -29,6 +29,7 @@ public class Mario extends RigidBody {
         FALLING,
         GROWING,
         SHRINKING,
+        BRAKING,
         DYING,
     }
 
@@ -48,15 +49,17 @@ public class Mario extends RigidBody {
     private TextureRegion standingSmall;
     private TextureRegion jumpingSmall;
     private Animation runningSmall;
+    private TextureRegion brakingSmall;
 
-    private Animation growing;
-    private Animation shrinking;
     private TextureRegion dying;
-    private TextureRegion crouching;
-
     private TextureRegion standingBig;
     private TextureRegion jumpingBig;
     private Animation runningBig;
+    private TextureRegion brakingBig;
+
+    private Animation growing;
+    private Animation shrinking;
+    private TextureRegion crouching;
 
     private boolean facingRight;
 
@@ -69,6 +72,7 @@ public class Mario extends RigidBody {
     private boolean growUp;
     private boolean shrink;
     private boolean crouch;
+    private boolean brake;
 
     private AssetManager assetManager;
 
@@ -81,6 +85,13 @@ public class Mario extends RigidBody {
 
         jumpingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 5, 0, 16, 16);
         jumpingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 5, 0, 16, 32);
+
+        brakingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 4, 0, 16, 16);
+        brakingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 4, 0, 16, 32);
+
+        // flip braking image for correct displaying
+        brakingSmall.flip(true, false);
+        brakingBig.flip(true, false);
 
         // running animation
         Array<TextureRegion> keyFrames = new Array<TextureRegion>();
@@ -269,16 +280,11 @@ public class Mario extends RigidBody {
     private void handleInput() {
         float maxSpeed = normalSpeedMax;
         float force = normalForce;
-        runningSmall.setFrameDuration(0.1f);
-        runningBig.setFrameDuration(0.1f);
 
         // Accelerate
-        if (Gdx.input.isKeyPressed(Input.Keys.Z)) {
+        if (Gdx.input.isKeyPressed(Input.Keys.Z) && grounded) {
             maxSpeed = fastSpeedMax;
             force = fastForce;
-
-            runningSmall.setFrameDuration(0.05f);
-            runningBig.setFrameDuration(0.05f);
         }
 
 
@@ -316,11 +322,17 @@ public class Mario extends RigidBody {
         // Move left
         if ((Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) && body.getLinearVelocity().x > -maxSpeed && !crouch) {
             body.applyForceToCenter(new Vector2(-force, 0.0f), true);
+            if (body.getLinearVelocity().x > normalSpeedMax || (currentState == State.BRAKING && body.getLinearVelocity().x > 0)) {
+                brake = true;
+            }
         }
 
         // Move right
         if ((Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) && body.getLinearVelocity().x < maxSpeed && !crouch) {
             body.applyForceToCenter(new Vector2(force, 0.0f), true);
+            if (body.getLinearVelocity().x < -normalSpeedMax || (currentState == State.BRAKING && body.getLinearVelocity().x < 0)) {
+                brake = true;
+            }
         }
 
     }
@@ -359,7 +371,7 @@ public class Mario extends RigidBody {
         };
 
         for (int i = 0; i < 3; i++) {
-            p1 = new Vector2(body.getPosition().x - radius / 2 * (1 - i), body.getPosition().y - radius);
+            p1 = new Vector2(body.getPosition().x - radius * (1 - i), body.getPosition().y - radius);
             p2 = new Vector2(p1.x, p1.y - 0.05f);
             world.rayCast(rayCastCallback, p1, p2);
         }
@@ -368,8 +380,6 @@ public class Mario extends RigidBody {
 
     @Override
     public void update(float delta) {
-
-
         checkGrounded();
 
         // die when falling below ground
@@ -433,18 +443,20 @@ public class Mario extends RigidBody {
             if (currentState == State.JUMPING) {
                 jump = false;
             }
-            if (body.getLinearVelocity().x != 0) {
+            if (brake) {
+                currentState = State.BRAKING;
+                brake = false;
+            }
+            else if (body.getLinearVelocity().x != 0) {
                 currentState = State.RUNNING;
             }
             else {
                 currentState = State.STANDING;
             }
-            if (previousState == State.JUMPING) {
-                jump = false;
-            }
         }
 
-        stateTime = previousState == currentState ? stateTime + delta : 0;
+        float v = 1.0f + Math.abs(body.getLinearVelocity().x) / fastSpeedMax;
+        stateTime = previousState == currentState ? stateTime + delta * v : 0;
 
         switch (currentState) {
             case DYING:
@@ -483,6 +495,14 @@ public class Mario extends RigidBody {
                     setRegion(runningSmall.getKeyFrame(stateTime, true));
                 }
                 break;
+            case BRAKING:
+                if (isGrownUp) {
+                    setRegion(brakingBig);
+                }
+                else {
+                    setRegion(brakingSmall);
+                }
+                break;
             case JUMPING:
                 if (isGrownUp) {
                     setRegion(jumpingBig);
@@ -514,6 +534,7 @@ public class Mario extends RigidBody {
         }
 
 
+        // limit Mario's moving area
         if (body.getPosition().x < 0.5f) {
             body.setTransform(0.5f, body.getPosition().y, 0);
             body.setLinearVelocity(0, body.getLinearVelocity().y);

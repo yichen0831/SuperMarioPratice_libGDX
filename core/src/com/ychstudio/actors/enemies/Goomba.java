@@ -38,7 +38,7 @@ public class Goomba extends Enemy {
         walking = new Animation(0.4f, keyFrames);
 
         movingRight = false;
-        speed = 2.0f;
+        speed = 3.2f;
         stateTime = 0;
 
     }

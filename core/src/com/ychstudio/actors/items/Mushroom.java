@@ -3,7 +3,7 @@ package com.ychstudio.actors.items;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.ychstudio.actors.enemies.Enemy;
+import com.ychstudio.actors.Mario;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -23,7 +23,7 @@ public class Mushroom extends Item {
         setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 16 / GameManager.PPM);
 
         movingRight = true;
-        speed = 2.0f;
+        speed = 3.2f;
 
         name = "mushroom";
     }
@@ -36,7 +36,7 @@ public class Mushroom extends Item {
         RayCastCallback rayCastCallback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                if (fixture.getUserData() == this) {
+                if (fixture.getUserData() == this || fixture.getUserData().getClass() == Mario.class) {
                     return 1;
                 }
                 if (fraction < 1.0f) {
