@@ -26,4 +26,9 @@ public abstract class MapTileObject extends RigidBody {
 
         setBounds(x - width / 2, y - height / 2, width, height);
     }
+
+    @Override
+    public void update(float delta) {
+
+    }
 }

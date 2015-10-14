@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ychstudio.SuperMario;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.effects.BrickDebris;
 import com.ychstudio.actors.effects.Effect;
 import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.effects.SpawningEffect;
@@ -192,6 +193,9 @@ public class PlayScreen implements Screen {
 
             if (spawningEffect.type == FlippingCoin.class) {
                 effects.add(new FlippingCoin(this, spawningEffect.x, spawningEffect.y));
+            }
+            else if (spawningEffect.type == BrickDebris.class) {
+                effects.add(new BrickDebris(this, spawningEffect.x, spawningEffect.y));
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.ychstudio.actors.Collider;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.effects.BrickDebris;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -20,11 +22,15 @@ import com.ychstudio.screens.PlayScreen;
 public class Brick extends MapTileObject {
 
     private boolean hit;
+    private boolean explode;
+
+    private float stateTime;
 
     private Vector2 originalPosition;
     private Vector2 movablePosition;
-
     private Vector2 targetPosition;
+
+    private TextureRegion debris;
 
     public Brick(PlayScreen playScreen, float x, float y, TiledMapTileMapObject mapObject) {
         super(playScreen, x, y, mapObject);
@@ -34,7 +40,11 @@ public class Brick extends MapTileObject {
 
         targetPosition = originalPosition;
 
+        debris = new TextureRegion(playScreen.getTextureAtlas().findRegion("Debris"), 0, 0, 16, 16);
+
         hit = false;
+        explode = false;
+        stateTime = 0;
     }
 
     @Override
@@ -71,6 +81,18 @@ public class Brick extends MapTileObject {
             return;
         }
 
+        stateTime += delta;
+
+        if (explode) {
+            setRegion(debris);
+            if (stateTime > 0.015f) {
+                queueDestroy();
+                for (int i = 0; i < 4; i++) {
+                    playScreen.addSpawnEffect(body.getPosition().x, body.getPosition().y + 0.5f, BrickDebris.class);
+                }
+            }
+        }
+
         float x = body.getPosition().x;
         float y = body.getPosition().y;
         if (Math.abs(y - targetPosition.y) > 0.01f) {
@@ -95,10 +117,10 @@ public class Brick extends MapTileObject {
             targetPosition = movablePosition;
 
             if (((Mario)other.getUserData()).isGrownUp()) {
-                hit = true;
                 GameManager.instance.getAssetManager().get("audio/sfx/breakblock.wav", Sound.class).play();
                 GameManager.instance.addScore(200);
-                queueDestroy();
+                explode = true;
+                stateTime = 0;
             }
             else {
                 GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();

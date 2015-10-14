@@ -30,10 +30,7 @@ public abstract class RigidBody extends Sprite {
     }
 
     protected abstract void defBody();
-
-    public void update(float delta) {
-
-    }
+    public abstract void update(float delta);
 
     public void onCollide(Collider other) {
 
