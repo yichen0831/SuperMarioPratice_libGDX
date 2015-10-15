@@ -47,14 +47,14 @@ public class Mushroom extends Item {
         };
 
         if (movingRight) {
-            p1 = new Vector2(body.getPosition().x + 8.0f / GameManager.PPM, body.getPosition().y);
-            p2 = new Vector2(p1).add(0.05f, 0);
+            p1 = new Vector2(body.getPosition().x + 6.0f / GameManager.PPM, body.getPosition().y);
+            p2 = new Vector2(p1).add(0.1f, 0);
 
             world.rayCast(rayCastCallback, p1, p2);
         }
         else {
-            p1 = new Vector2(body.getPosition().x - 8.0f / GameManager.PPM, body.getPosition().y);
-            p2 = new Vector2(p1).add(-0.05f, 0);
+            p1 = new Vector2(body.getPosition().x - 6.0f / GameManager.PPM, body.getPosition().y);
+            p2 = new Vector2(p1).add(-0.1f, 0);
 
             world.rayCast(rayCastCallback, p1, p2);
         }
@@ -93,6 +93,10 @@ public class Mushroom extends Item {
         queueDestroy();
     }
 
+    public void bounce() {
+        body.applyLinearImpulse(new Vector2(0.0f, 6.0f), body.getWorldCenter(), true);
+    }
+
     @Override
     protected void defBody() {
 
@@ -109,9 +113,14 @@ public class Mushroom extends Item {
         fixtureDef.shape = shape;
         fixtureDef.filter.categoryBits = GameManager.ITEM_BIT;
         fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.MARIO_BIT;
-
         body.createFixture(fixtureDef).setUserData(this);
 
+        EdgeShape edgeShape = new EdgeShape();
+        edgeShape.set(new Vector2(-6.8f, -6.8f).scl(1 / GameManager.PPM), new Vector2(6.8f, -6.8f).scl(1 / GameManager.PPM));
+        fixtureDef.shape = edgeShape;
+        body.createFixture(fixtureDef).setUserData(this);
+
+        edgeShape.dispose();
         shape.dispose();
     }
 }

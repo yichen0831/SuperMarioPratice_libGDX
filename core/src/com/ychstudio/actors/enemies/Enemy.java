@@ -1,5 +1,6 @@
 package com.ychstudio.actors.enemies;
 
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.ychstudio.actors.RigidBody;
 import com.ychstudio.screens.PlayScreen;
 
@@ -10,11 +11,13 @@ import com.ychstudio.screens.PlayScreen;
  */
 public abstract class Enemy extends RigidBody {
 
-    protected int hp = 1;
+    protected TextureAtlas textureAtlas;
+
     protected boolean active = false;
 
     public Enemy(PlayScreen playScreen, float x, float y) {
         super(playScreen, x, y);
+        this.textureAtlas = playScreen.getTextureAtlas();
     }
 
     public abstract void getDamage(int damage);

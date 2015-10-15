@@ -254,7 +254,7 @@ public class PlayScreen implements Screen {
         // Box2D world step
         accumulator += delta;
         if (accumulator > step) {
-            world.step(step, 6, 2);
+            world.step(step, 8, 3);
             accumulator -= step;
         }
 
@@ -295,6 +295,9 @@ public class PlayScreen implements Screen {
         }
 
         camera.position.x = MathUtils.lerp(camera.position.x, targetX, 0.1f);
+        if (Math.abs(camera.position.x - targetX) < 0.1f) {
+            camera.position.x = targetX;
+        }
         camera.update();
 
         // update map renderer
@@ -348,9 +351,9 @@ public class PlayScreen implements Screen {
             mapTileObject.draw(game.batch);
         }
 
-        // draw enemies
-        for (Enemy enemy : enemies) {
-            enemy.draw(game.batch);
+        // draw effects
+        for (Effect effect : effects) {
+            effect.draw(game.batch);
         }
 
         // draw items
@@ -358,9 +361,9 @@ public class PlayScreen implements Screen {
             item.draw(game.batch);
         }
 
-        // draw effects
-        for (Effect effect : effects) {
-            effect.draw(game.batch);
+        // draw enemies
+        for (Enemy enemy : enemies) {
+            enemy.draw(game.batch);
         }
 
         // draw Mario

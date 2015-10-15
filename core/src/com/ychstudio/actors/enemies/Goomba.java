@@ -23,19 +23,20 @@ public class Goomba extends Enemy {
     private boolean movingRight;
     private float speed;
 
+    private boolean stomped = false;
+
     public Goomba(PlayScreen playScreen, float x, float y) {
         super(playScreen, x, y);
 
         Array<TextureRegion> keyFrames = new Array<TextureRegion>();
 
         for (int i = 0; i < 2; i++) {
-            keyFrames.add(new TextureRegion(playScreen.getTextureAtlas().findRegion("Goomba"), 16 * i, 0, 16, 16));
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("Goomba"), 16 * i, 0, 16, 16));
         }
+        walking = new Animation(0.2f, keyFrames);
 
         setRegion(keyFrames.get(0));
         setBounds(getX() - 8.0f / GameManager.PPM, getY() - 8.0f / GameManager.PPM, 16.0f / GameManager.PPM, 16.0f / GameManager.PPM);
-
-        walking = new Animation(0.4f, keyFrames);
 
         movingRight = false;
         speed = 3.2f;
@@ -44,7 +45,6 @@ public class Goomba extends Enemy {
     }
 
     public void checkMovingDirection() {
-
         Vector2 p1;
         Vector2 p2;
 
@@ -63,13 +63,13 @@ public class Goomba extends Enemy {
 
         if (movingRight) {
             p1 = new Vector2(body.getPosition().x + 8.0f / GameManager.PPM, body.getPosition().y);
-            p2 = new Vector2(p1).add(0.05f, 0);
+            p2 = new Vector2(p1).add(0.1f, 0);
 
             world.rayCast(rayCastCallback, p1, p2);
         }
         else {
             p1 = new Vector2(body.getPosition().x - 8.0f / GameManager.PPM, body.getPosition().y);
-            p2 = new Vector2(p1).add(-0.05f, 0);
+            p2 = new Vector2(p1).add(-0.1f, 0);
 
             world.rayCast(rayCastCallback, p1, p2);
         }
@@ -91,8 +91,9 @@ public class Goomba extends Enemy {
         stateTime += delta;
 
         if (toBeDestroyed) {
-
-            setRegion(new TextureRegion(playScreen.getTextureAtlas().findRegion("Goomba"), 16 * 2, 0, 16, 16));
+            if (stomped) {
+                setRegion(new TextureRegion(textureAtlas.findRegion("Goomba"), 16 * 2, 0, 16, 16));
+            }
 
             if (stateTime > 1.0f) {
                 world.destroyBody(body);
@@ -118,21 +119,34 @@ public class Goomba extends Enemy {
 
     @Override
     public void getDamage(int damage) {
+        if (toBeDestroyed) {
+            return;
+        }
 
-        hp -= damage;
-
-        if (hp <= 0) {
+        // hit by Mario on head
+        if (damage == 1) {
             Filter filter = new Filter();
             filter.maskBits = GameManager.GROUND_BIT;
             for (Fixture fixture : body.getFixtureList()) {
                 fixture.setFilterData(filter);
             }
-            stateTime = 0;
+            stomped = true;
 
-            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-            GameManager.instance.addScore(200);
-            queueDestroy();
         }
+        else {
+            Filter filter = new Filter();
+            filter.maskBits = GameManager.NOTHING_BIT;
+            for (Fixture fixture : body.getFixtureList()) {
+                fixture.setFilterData(filter);
+            }
+            body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
+            setFlip(false, true);
+        }
+
+        stateTime = 0;
+        GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+        GameManager.instance.addScore(200);
+        queueDestroy();
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.enemies.Goomba;
+import com.ychstudio.actors.enemies.Koopa;
 import com.ychstudio.actors.maptiles.*;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -86,6 +87,16 @@ public class WorldCreator {
                 float y = ((TiledMapTileMapObject) mapObject).getY();
 
                 enemies.add(new Goomba(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM));
+            }
+        }
+
+        mapLayer = tiledMap.getLayers().get("Koopas");
+        if (mapLayer != null) {
+            for (MapObject mapObject : mapLayer.getObjects()) {
+                float x = ((TiledMapTileMapObject) mapObject).getX();
+                float y = ((TiledMapTileMapObject) mapObject).getY();
+
+                enemies.add(new Koopa(playScreen, (x + 8) / GameManager.PPM, (y + 8) / GameManager.PPM));
             }
         }
 

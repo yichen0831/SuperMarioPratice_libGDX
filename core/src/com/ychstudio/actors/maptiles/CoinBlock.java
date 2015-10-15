@@ -5,14 +5,12 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.Collider;
 import com.ychstudio.actors.effects.FlippingCoin;
+import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -26,6 +24,7 @@ public class CoinBlock extends MapTileObject {
 
     private boolean hitable;
     private boolean hit;
+    private boolean lethal;
 
     private Vector2 originalPosition;
     private Vector2 movablePosition;
@@ -56,6 +55,7 @@ public class CoinBlock extends MapTileObject {
 
         hitable = true;
         hit = false;
+        lethal = false;
 
         stateTimer = 0;
     }
@@ -94,14 +94,41 @@ public class CoinBlock extends MapTileObject {
 
         float x = body.getPosition().x;
         float y = body.getPosition().y;
-        if (Math.abs(y - targetPosition.y) > 0.01f) {
-            y = MathUtils.lerp(y, targetPosition.y, 0.6f);
-            body.setTransform(x, y, 0);
+        Vector2 dist = new Vector2(x, y).sub(targetPosition);
+        if (dist.len2() > 0.0001f) {
+            body.setTransform(new Vector2(x, y).lerp(targetPosition, 0.6f), 0);
         }
         else {
+            body.setTransform(targetPosition, 0);
             if (hit) {
                 hit = false;
                 targetPosition = originalPosition;
+            }
+        }
+
+        if (lethal) {
+            lethal = false;
+
+            RayCastCallback raycastCallback = new RayCastCallback() {
+                @Override
+                public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                    if (fraction <= 1.0f) {
+                        if (fixture.getUserData() instanceof Enemy) {
+                            ((Enemy) fixture.getUserData()).getDamage(2);
+                        } else if (fixture.getUserData() instanceof Mushroom) {
+                            ((Mushroom) fixture.getUserData()).bounce();
+                        }
+                        return 0;
+                    }
+                    return 0;
+                }
+            };
+
+            // damage the enemy or push up mushroom above when hit
+            for (int i = 0; i < 3; i++) {
+                Vector2 p1 = new Vector2(body.getPosition().x - (i - 1) * 0.5f, body.getPosition().y + 0.4f);
+                Vector2 p2 = new Vector2(p1).add(0, 0.6f);
+                world.rayCast(raycastCallback, p1, p2);
             }
         }
 
@@ -116,6 +143,7 @@ public class CoinBlock extends MapTileObject {
                 GameManager.instance.addScore(200);
                 hitable = false;
                 hit = true;
+                lethal = true;
                 targetPosition = movablePosition;
 
                 if (mapObject.getProperties().containsKey("mushroom")) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="212" height="15" tilewidth="16" tileheight="16" nextobjectid="605">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="212" height="15" tilewidth="16" tileheight="16" nextobjectid="615">
  <tileset firstgid="1" name="tileset_gutter" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="924">
   <image source="tileset_gutter.png" width="594" height="504"/>
  </tileset>
@@ -547,6 +547,8 @@
   <object id="492" gid="2" x="2672" y="160" width="16" height="16"/>
   <object id="493" gid="2" x="2704" y="160" width="16" height="16"/>
   <object id="503" gid="2" x="1856" y="160" width="16" height="16"/>
+  <object id="612" gid="2" x="272" y="144" width="16" height="16"/>
+  <object id="613" gid="2" x="368" y="144" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="CoinBlocks">
   <object id="107" gid="25" x="224" y="160" width="16" height="16"/>
@@ -618,6 +620,12 @@
   <object id="500" gid="266" x="2592" y="192" width="16" height="16"/>
   <object id="501" gid="265" x="2576" y="192" width="16" height="16"/>
   <object id="502" gid="298" x="2576" y="208" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="Goombas">
+  <object id="614" gid="123" x="352" y="144" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup name="Koopas">
+  <object id="605" gid="149" x="544" y="208" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Start">
   <object id="603" gid="64" x="96" y="208" width="16" height="16"/>
