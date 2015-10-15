@@ -26,7 +26,7 @@ public class BrickDebris extends Effect {
         setSize(16 / GameManager.PPM, 16 / GameManager.PPM);
 
         // apply random force
-        Vector2 force = new Vector2(MathUtils.random() * 8.0f - 4.0f, MathUtils.random() * 18.0f);
+        Vector2 force = new Vector2(MathUtils.random() * 8.0f - 4.0f, MathUtils.random() * 6.0f + 12.0f);
         body.applyLinearImpulse(force, body.getWorldCenter(), true);
 
     }
@@ -44,6 +44,7 @@ public class BrickDebris extends Effect {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
+        fixtureDef.restitution = 0.1f;
         fixtureDef.filter.categoryBits = GameManager.GROUND_BIT;
         fixtureDef.filter.maskBits = GameManager.GROUND_BIT;
 

@@ -74,6 +74,10 @@ public class Mario extends RigidBody {
     private boolean crouch;
     private boolean brake;
 
+    private boolean smallJump = false;
+    private boolean bigJump = false;
+    private float jumpSoundTimer = 0f;
+
     private AssetManager assetManager;
 
     public Mario(PlayScreen playScreen, float x, float y) {
@@ -287,19 +291,33 @@ public class Mario extends RigidBody {
             force = fastForce;
         }
 
-
         // Jump
         if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.X)) && grounded) {
             body.applyLinearImpulse(new Vector2(0.0f, 16.0f), body.getWorldCenter(), true);
-            assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
+            jumpSoundTimer = 0;
+//            assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
             jump = true;
+            smallJump = true;
             keyPressedTime = 0;
         }
         if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.X)) && currentState == State.JUMPING) {
             if (keyPressedTime > 0.1f && keyPressedTime < 0.15f) {
                 body.applyLinearImpulse(new Vector2(0.0f, 5.0f), body.getWorldCenter(), true);
+//                assetManager.get("audio/sfx/jump_super.wav", Sound.class).play();
                 keyPressedTime = 99.0f;
+                bigJump = true;
             }
+        }
+
+        if (smallJump && jumpSoundTimer > 0.15f) {
+            if (bigJump) {
+                assetManager.get("audio/sfx/jump_super.wav", Sound.class).play();
+            }
+            else {
+                assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
+            }
+            smallJump = false;
+            bigJump = false;
         }
 
         // crouch
@@ -382,6 +400,8 @@ public class Mario extends RigidBody {
     public void update(float delta) {
         checkGrounded();
 
+        jumpSoundTimer += delta;
+
         // die when falling below ground
         if (body.getPosition().y < -2.0f) {
             die = true;
@@ -392,9 +412,7 @@ public class Mario extends RigidBody {
             handleInput();
         }
 
-
         State previousState = currentState;
-
 
         if (die) {
             if (!isDead) {
