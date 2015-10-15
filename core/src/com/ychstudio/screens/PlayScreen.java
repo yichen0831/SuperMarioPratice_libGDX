@@ -80,6 +80,8 @@ public class PlayScreen implements Screen {
 
     private AssetManager assetManager;
 
+    private float countDown;
+
     public PlayScreen(SuperMario game) {
         this.game = game;
         assetManager = GameManager.instance.getAssetManager();
@@ -149,6 +151,8 @@ public class PlayScreen implements Screen {
 
         box2DDebugRenderer = new Box2DDebugRenderer();
         renderB2DDebug = false;
+
+        countDown = 3.0f;
 
     }
 
@@ -251,6 +255,7 @@ public class PlayScreen implements Screen {
         handleSpawningEffect();
         handleMusic();
 
+
         // Box2D world step
         accumulator += delta;
         if (accumulator > step) {
@@ -307,6 +312,18 @@ public class PlayScreen implements Screen {
         hud.update(delta);
 
 //        cleanUpDestroyedObjects(); // do not need to clean yet as performance concerns
+
+
+        // check if Mario is dead
+        if (mario.isDead()) {
+            countDown -= delta;
+
+            if (countDown < 0) {
+                GameManager.instance.gameOver();
+                game.setScreen(new GameOverScreen(game));
+                dispose();
+            }
+        }
     }
 
     private void cleanUpDestroyedObjects() {
@@ -339,6 +356,7 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         update(delta);
+
 
         // draw map
         mapRenderer.render(new int[] {0, 1});

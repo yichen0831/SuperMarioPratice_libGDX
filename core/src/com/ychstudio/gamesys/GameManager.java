@@ -53,6 +53,10 @@ public class GameManager implements Disposable {
         score = 0;
     }
 
+    public void gameOver() {
+        clearScore();
+    }
+
     public int getScore() {
         return score;
     }
