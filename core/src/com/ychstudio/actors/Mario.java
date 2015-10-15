@@ -367,6 +367,10 @@ public class Mario extends RigidBody {
         return isDead;
     }
 
+    public void suddenDeath() {
+        die = true;
+    }
+
     private void checkGrounded() {
         grounded = false;
 
@@ -479,6 +483,7 @@ public class Mario extends RigidBody {
         switch (currentState) {
             case DYING:
                 setRegion(dying);
+                setSize(16 / GameManager.PPM, 16 / GameManager.PPM);
                 break;
             case SHRINKING:
                 setRegion(shrinking.getKeyFrame(stateTime, false));

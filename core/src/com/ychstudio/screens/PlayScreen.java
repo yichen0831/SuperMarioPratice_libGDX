@@ -80,6 +80,8 @@ public class PlayScreen implements Screen {
 
     private AssetManager assetManager;
 
+    private boolean playingHurryMusic;
+
     private float countDown;
 
     public PlayScreen(SuperMario game) {
@@ -90,6 +92,8 @@ public class PlayScreen implements Screen {
 
     private void loadAudio() {
         assetManager.load("audio/music/mario_music.ogg", Music.class);
+        assetManager.load("audio/music/mario_music_hurry.ogg", Music.class);
+        assetManager.load("audio/music/out_of_time.wav", Music.class);
         assetManager.load("audio/sfx/breakblock.wav", Sound.class);
         assetManager.load("audio/sfx/bump.wav", Sound.class);
         assetManager.load("audio/sfx/coin.wav", Sound.class);
@@ -146,13 +150,12 @@ public class PlayScreen implements Screen {
 
         accumulator = 0;
 
-        assetManager.get("audio/music/mario_music.ogg", Music.class).setLooping(true);
-        assetManager.get("audio/music/mario_music.ogg", Music.class).play();
-
         box2DDebugRenderer = new Box2DDebugRenderer();
         renderB2DDebug = false;
 
         countDown = 3.0f;
+
+        playingHurryMusic = false;
 
     }
 
@@ -205,15 +208,6 @@ public class PlayScreen implements Screen {
     }
 
     public void handleInput() {
-        // Press M to pause or continue background music
-        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
-            if (assetManager.get("audio/music/mario_music.ogg", Music.class).isPlaying()) {
-                assetManager.get("audio/music/mario_music.ogg", Music.class).pause();
-            }
-            else {
-                assetManager.get("audio/music/mario_music.ogg", Music.class).play();
-            }
-        }
 
         // Press B to toggle Box2DDebuggerRenderer
         if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
@@ -243,6 +237,27 @@ public class PlayScreen implements Screen {
     public void handleMusic() {
         if (mario.isDead()) {
             assetManager.get("audio/music/mario_music.ogg", Music.class).stop();
+            assetManager.get("audio/music/mario_music_hurry.ogg", Music.class).stop();
+            assetManager.get("audio/music/out_of_time.wav", Music.class).stop();
+        }
+        else {
+            if (hud.getTimeLeft() < 60) {
+                if (!playingHurryMusic) {
+                    assetManager.get("audio/music/mario_music.ogg", Music.class).stop();
+                    assetManager.get("audio/music/out_of_time.wav", Music.class).play();
+                    playingHurryMusic = true;
+                }
+                else {
+                    if (!assetManager.get("audio/music/out_of_time.wav", Music.class).isPlaying()) {
+                        assetManager.get("audio/music/mario_music_hurry.ogg", Music.class).setLooping(true);
+                        assetManager.get("audio/music/mario_music_hurry.ogg", Music.class).play();
+                    }
+                }
+            }
+            else {
+                assetManager.get("audio/music/mario_music.ogg", Music.class).setLooping(true);
+                assetManager.get("audio/music/mario_music.ogg", Music.class).play();
+            }
         }
     }
 
@@ -255,6 +270,9 @@ public class PlayScreen implements Screen {
         handleSpawningEffect();
         handleMusic();
 
+        if (hud.getTimeLeft() == 0) {
+            mario.suddenDeath();
+        }
 
         // Box2D world step
         accumulator += delta;

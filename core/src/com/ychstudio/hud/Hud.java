@@ -23,7 +23,7 @@ public class Hud implements Disposable {
 
     private Stage stage;
 
-    private int time;
+    private int timeLeft;
 
     private Label scoreLabel;
     private Label timeLabel;
@@ -41,7 +41,7 @@ public class Hud implements Disposable {
         Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 2, GameManager.WINDOW_HEIGHT / 2, new OrthographicCamera());
         stage = new Stage(viewport, batch);
 
-        time = 300;
+        timeLeft = 300;
 
         Label scoreTextLabel;
         Label timeTextLabel;
@@ -52,7 +52,7 @@ public class Hud implements Disposable {
         levelTextLabel = new Label("LEVEL", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timeLabel = new Label(String.format("%03d", time), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        timeLabel = new Label(String.format("%03d", timeLeft), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelLabel = new Label("1-1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         fpsLabel = new Label("FPS:    ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
@@ -87,6 +87,10 @@ public class Hud implements Disposable {
         return showFPS;
     }
 
+    public int getTimeLeft() {
+        return timeLeft;
+    }
+
     public void setShowFPS(boolean value) {
         showFPS = value;
     }
@@ -114,9 +118,10 @@ public class Hud implements Disposable {
         }
 
         if (accumulator > 1.0f) {
-            time -= 1;
+            if (timeLeft > 0)
+                timeLeft -= 1;
             accumulator -= 1.0f;
-            timeLabel.setText(String.format("%03d", time));
+            timeLabel.setText(String.format("%03d", timeLeft));
         }
 
 
