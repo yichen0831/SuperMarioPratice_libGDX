@@ -286,24 +286,22 @@ public class Mario extends RigidBody {
         float force = normalForce;
 
         // Accelerate
-        if (Gdx.input.isKeyPressed(Input.Keys.Z) && grounded) {
+        if (Gdx.input.isKeyPressed(Input.Keys.X) && grounded) {
             maxSpeed = fastSpeedMax;
             force = fastForce;
         }
 
         // Jump
-        if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.X)) && grounded) {
+        if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.C)) && grounded) {
             body.applyLinearImpulse(new Vector2(0.0f, 16.0f), body.getWorldCenter(), true);
             jumpSoundTimer = 0;
-//            assetManager.get("audio/sfx/jump_small.wav", Sound.class).play();
             jump = true;
             smallJump = true;
             keyPressedTime = 0;
         }
-        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.X)) && currentState == State.JUMPING) {
+        if ((Gdx.input.isKeyPressed(Input.Keys.SPACE) || Gdx.input.isKeyPressed(Input.Keys.C)) && currentState == State.JUMPING) {
             if (keyPressedTime > 0.1f && keyPressedTime < 0.15f) {
                 body.applyLinearImpulse(new Vector2(0.0f, 5.0f), body.getWorldCenter(), true);
-//                assetManager.get("audio/sfx/jump_super.wav", Sound.class).play();
                 keyPressedTime = 99.0f;
                 bigJump = true;
             }

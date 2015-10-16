@@ -55,8 +55,6 @@ public class Hud implements Disposable {
         timeLabel = new Label(String.format("%03d", timeLeft), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelLabel = new Label("1-1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
-        fpsLabel = new Label("FPS:    ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        fpsLabel.setPosition(6f, 6f);
 
         Table table = new Table();
         table.top();
@@ -71,6 +69,14 @@ public class Hud implements Disposable {
         table.add(scoreLabel).expandX();
         table.add(levelLabel).expandX();
         table.add(timeLabel).expandX();
+
+        table.row();
+
+        // FPS
+        fpsLabel = new Label("FPS:    ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        Table fpsTable = new Table();
+        fpsTable.add(fpsLabel);
+        table.add(fpsTable).expand().bottom();
 
         stage.addActor(table);
 
@@ -99,15 +105,12 @@ public class Hud implements Disposable {
         scoreLabel.setText(String.format("%06d", GameManager.instance.getScore()));
         stage.draw();
 
-        if (showFPS) {
-            batch.begin();
-            fpsLabel.draw(batch, 1.0f);
-            batch.end();
-        }
     }
 
     public void update(float delta) {
         accumulator += delta;
+
+        fpsLabel.setVisible(showFPS);
 
         if (showFPS) {
             fpsTimeAccumulator += delta;

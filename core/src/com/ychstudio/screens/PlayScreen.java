@@ -84,6 +84,8 @@ public class PlayScreen implements Screen {
 
     private float countDown;
 
+    private boolean isDisposed; // for Box2dDebugRenderer to check
+
     public PlayScreen(SuperMario game) {
         this.game = game;
         assetManager = GameManager.instance.getAssetManager();
@@ -153,6 +155,7 @@ public class PlayScreen implements Screen {
         box2DDebugRenderer = new Box2DDebugRenderer();
         renderB2DDebug = false;
 
+        isDisposed = false;
         countDown = 3.0f;
 
         playingHurryMusic = false;
@@ -409,7 +412,7 @@ public class PlayScreen implements Screen {
 
         hud.draw();
 
-        if (renderB2DDebug) {
+        if (renderB2DDebug && !isDisposed) {
             box2DDebugRenderer.render(world, camera.combined);
         }
 
@@ -437,10 +440,11 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
+        isDisposed = true;
+        hud.dispose();
         tiledMap.dispose();
         world.dispose();
         textureAtlas.dispose();
         box2DDebugRenderer.dispose();
-        hud.dispose();
     }
 }
