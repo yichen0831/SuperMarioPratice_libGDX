@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.items.Item;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -51,7 +52,7 @@ public class Goomba extends Enemy {
         RayCastCallback rayCastCallback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                if (fixture.getUserData() == this) {
+                if (fixture.getUserData() == this || fixture.getUserData() instanceof Item) {
                     return 1;
                 }
                 if (fraction < 1.0f && fixture.getUserData().getClass() != Mario.class) {

@@ -32,8 +32,9 @@ public class GameManager implements Disposable {
     public static final short MARIO_HEAD_BIT = 1 << 2;
     public static final short ENEMY_LETHAL_BIT = 1 << 3;
     public static final short ENEMY_WEAKNESS_BIT = 1 << 4;
-    public static final short ITEM_BIT = 1 << 5;
-    public static final short FLAGPOLE_BIT = 1 << 6;
+    public static final short ENEMY_INTERACT_BIT = 1 << 5;
+    public static final short ITEM_BIT = 1 << 6;
+    public static final short FLAGPOLE_BIT = 1 << 7;
 
     private AssetManager assetManager;
 

@@ -19,8 +19,6 @@ import com.ychstudio.gamesys.GameManager;
  */
 public class Hud implements Disposable {
 
-    private SpriteBatch batch;
-
     private Stage stage;
 
     private int timeLeft;
@@ -36,7 +34,6 @@ public class Hud implements Disposable {
     private float accumulator;
 
     public Hud(SpriteBatch batch) {
-        this.batch = batch;
 
         Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 2, GameManager.WINDOW_HEIGHT / 2, new OrthographicCamera());
         stage = new Stage(viewport, batch);
@@ -52,7 +49,7 @@ public class Hud implements Disposable {
         levelTextLabel = new Label("LEVEL", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
         scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timeLabel = new Label(String.format("%03d", timeLeft), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        timeLabel = new Label(intToString(timeLeft, 3), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
         levelLabel = new Label("1-1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
 
 
@@ -102,7 +99,7 @@ public class Hud implements Disposable {
     }
 
     public void draw() {
-        scoreLabel.setText(String.format("%06d", GameManager.instance.getScore()));
+        scoreLabel.setText(intToString(GameManager.instance.getScore(), 6));
         stage.draw();
 
     }
@@ -115,7 +112,7 @@ public class Hud implements Disposable {
         if (showFPS) {
             fpsTimeAccumulator += delta;
             if (fpsTimeAccumulator > 0.2) {
-                fpsLabel.setText(String.format("FPS: %3d", (int) (1 / delta * GameManager.timeScale)));
+                fpsLabel.setText("FPS: " + intToString((int) (1 / delta * GameManager.timeScale), 3));
                 fpsTimeAccumulator = 0;
             }
         }
@@ -124,10 +121,22 @@ public class Hud implements Disposable {
             if (timeLeft > 0)
                 timeLeft -= 1;
             accumulator -= 1.0f;
-            timeLabel.setText(String.format("%03d", timeLeft));
+            timeLabel.setText(intToString(timeLeft, 3));
         }
 
 
+    }
+
+    private String intToString(int value, int length) {
+        String valueStr = Integer.toString(value);
+        StringBuilder result = new StringBuilder();
+        if (valueStr.length() < length) {
+            for (int i = 0; i < length - valueStr.length(); i++) {
+                result.append(0);
+            }
+        }
+        result.append(valueStr);
+        return result.toString();
     }
 
     @Override

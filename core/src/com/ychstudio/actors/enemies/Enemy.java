@@ -1,6 +1,7 @@
 package com.ychstudio.actors.enemies;
 
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.ychstudio.actors.Mario;
 import com.ychstudio.actors.RigidBody;
 import com.ychstudio.screens.PlayScreen;
 
@@ -21,5 +22,9 @@ public abstract class Enemy extends RigidBody {
     }
 
     public abstract void getDamage(int damage);
+
+    public void interact(Mario mario) {
+
+    }
 
 }

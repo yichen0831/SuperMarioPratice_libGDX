@@ -36,7 +36,7 @@ import com.ychstudio.hud.Hud;
 import com.ychstudio.utils.WorldContactListener;
 import com.ychstudio.utils.WorldCreator;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.LinkedList;
 
 /**
  * Created by yichen on 10/11/15.
@@ -69,10 +69,10 @@ public class PlayScreen implements Screen {
     private Array<Enemy> enemies;
 
     private Array<Item> items;
-    private LinkedBlockingDeque<SpawningItem> itemSpawnQuque;
+    private LinkedList<SpawningItem> itemSpawnQuque;
 
     private Array<Effect> effects;
-    private LinkedBlockingDeque<SpawningEffect> effectSpawnQueue;
+    private LinkedList<SpawningEffect> effectSpawnQueue;
 
     private Mario mario;
 
@@ -83,8 +83,6 @@ public class PlayScreen implements Screen {
     private boolean playingHurryMusic;
 
     private float countDown;
-
-    private boolean isDisposed; // for Box2dDebugRenderer to check
 
     public PlayScreen(SuperMario game) {
         this.game = game;
@@ -141,11 +139,11 @@ public class PlayScreen implements Screen {
 
         // for spawning item
         items = new Array<Item>();
-        itemSpawnQuque = new LinkedBlockingDeque<SpawningItem>();
+        itemSpawnQuque = new LinkedList<SpawningItem>();
 
         // for spawning effect
         effects = new Array<Effect>();
-        effectSpawnQueue = new LinkedBlockingDeque<SpawningEffect>();
+        effectSpawnQueue = new LinkedList<SpawningEffect>();
 
         hud = new Hud(game.batch);
         hud.setLevel("1-1");
@@ -155,7 +153,6 @@ public class PlayScreen implements Screen {
         box2DDebugRenderer = new Box2DDebugRenderer();
         renderB2DDebug = false;
 
-        isDisposed = false;
         countDown = 3.0f;
 
         playingHurryMusic = false;
@@ -376,9 +373,6 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        update(delta);
-
-
         // draw map
         mapRenderer.render(new int[] {0, 1});
 
@@ -412,9 +406,11 @@ public class PlayScreen implements Screen {
 
         hud.draw();
 
-        if (renderB2DDebug && !isDisposed) {
+        if (renderB2DDebug) {
             box2DDebugRenderer.render(world, camera.combined);
         }
+
+        update(delta);
 
     }
 
@@ -440,7 +436,6 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-        isDisposed = true;
         hud.dispose();
         tiledMap.dispose();
         world.dispose();

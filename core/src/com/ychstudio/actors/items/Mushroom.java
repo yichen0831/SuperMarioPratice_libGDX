@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.ychstudio.actors.Mario;
+import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -36,7 +37,7 @@ public class Mushroom extends Item {
         RayCastCallback rayCastCallback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
-                if (fixture.getUserData() == this || fixture.getUserData().getClass() == Mario.class) {
+                if (fixture.getUserData() == this || fixture.getUserData().getClass() == Mario.class || fixture.getUserData() instanceof Enemy) {
                     return 1;
                 }
                 if (fraction < 1.0f) {
