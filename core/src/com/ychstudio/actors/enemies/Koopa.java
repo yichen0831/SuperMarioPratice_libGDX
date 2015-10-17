@@ -1,5 +1,6 @@
 package com.ychstudio.actors.enemies;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -39,7 +40,6 @@ public class Koopa extends Enemy {
     private boolean movingRight;
 
     private State currentState;
-    private State previousState;
 
     private Fixture lethalFixture0;
     private Fixture lethalFixture1;
@@ -163,6 +163,8 @@ public class Koopa extends Enemy {
             return;
         }
 
+        State previousState = currentState;
+
         if (die) {
             die = false;
             body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
@@ -172,16 +174,22 @@ public class Koopa extends Enemy {
             for (Fixture fixture : body.getFixtureList()) {
                 fixture.setFilterData(filter);
             }
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.addScore(200);
             currentState = State.DYING;
         }
         else if (shell) {
             shell = false;
             becomeShell();
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.addScore(200);
             currentState = State.SHELLING;
         }
         else if (spin) {
             spin = false;
             becomeNoraml();
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.addScore(200);
             currentState = State.SPINNING;
         }
         else if (awake) {
@@ -231,15 +239,16 @@ public class Koopa extends Enemy {
                 break;
 
             case SPINNING:
+                setRegion(shelling);
                 checkMovingDirection();
                 velocity = body.getLinearVelocity();
                 velocity.x = 8.0f * (movingRight ? 1 : -1);
                 body.setLinearVelocity(velocity);
-                setRegion(shelling);
                 break;
 
             case DYING:
             default:
+                setRegion(shelling);
                 if (stateTime > 2.0f) {
                     queueDestroy();
                 }
@@ -247,13 +256,18 @@ public class Koopa extends Enemy {
         }
 
         stateTime += delta;
-        previousState = currentState;
 
         if (movingRight) {
             flip(true, false);
         }
 
-        setPosition(body.getPosition().x - 8 / GameManager.PPM, body.getPosition().y - 8 / GameManager.PPM);
+        if (currentState == State.DYING) {
+            flip(false, true);
+            setPosition(body.getPosition().x - 8 / GameManager.PPM, body.getPosition().y - 24 / GameManager.PPM);
+        }
+        else {
+            setPosition(body.getPosition().x - 8 / GameManager.PPM, body.getPosition().y - 8 / GameManager.PPM);
+        }
     }
 
     @Override
@@ -343,6 +357,9 @@ public class Koopa extends Enemy {
                         ((Enemy) fixture.getUserData()).getDamage(3);
                     }
                     else if (fixture.getUserData().getClass() != Mario.class) {
+                        if (currentState == State.SPINNING) {
+                            GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();
+                        }
                         movingRight = !movingRight;
                     }
                 }
