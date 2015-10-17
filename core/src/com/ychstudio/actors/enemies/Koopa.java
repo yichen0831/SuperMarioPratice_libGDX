@@ -3,6 +3,7 @@ package com.ychstudio.actors.enemies;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
@@ -109,6 +110,15 @@ public class Koopa extends Enemy {
         weakFixture.setFilterData(filter);
     }
 
+    private void becomeDead() {
+        Filter filter = new Filter();
+        filter.categoryBits = GameManager.NOTHING_BIT;
+        filter.maskBits = GameManager.NOTHING_BIT;
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setFilterData(filter);
+        }
+    }
+
     @Override
     public void getDamage(int damage) {
         if (toBeDestroyed) {
@@ -168,12 +178,7 @@ public class Koopa extends Enemy {
         if (die) {
             die = false;
             body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
-            Filter filter = new Filter();
-            filter.categoryBits = GameManager.NOTHING_BIT;
-            filter.maskBits = GameManager.NOTHING_BIT;
-            for (Fixture fixture : body.getFixtureList()) {
-                fixture.setFilterData(filter);
-            }
+            becomeDead();
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
             GameManager.instance.addScore(200);
             currentState = State.DYING;
@@ -272,10 +277,7 @@ public class Koopa extends Enemy {
 
     @Override
     public void interact(Mario mario) {
-        float marioPos = mario.getX() + 16 / GameManager.PPM;
-
-        movingRight = marioPos <= body.getPosition().x;
-
+        movingRight = mario.getX() <= getX();
         spin = true;
     }
 
@@ -358,7 +360,11 @@ public class Koopa extends Enemy {
                     }
                     else if (fixture.getUserData().getClass() != Mario.class) {
                         if (currentState == State.SPINNING) {
-                            GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();
+                            float cameraX = playScreen.getCamera().position.x;
+                            float distanceRatio = (body.getPosition().x - cameraX) / GameManager.V_WIDTH * 2;
+                            float pan = MathUtils.clamp(distanceRatio, -1, 1);
+                            float volume = MathUtils.clamp(2.0f - (float)Math.sqrt(Math.abs(distanceRatio)), 0, 1);
+                            GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play(volume, 1.0f, pan);
                         }
                         movingRight = !movingRight;
                     }

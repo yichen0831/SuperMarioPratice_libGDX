@@ -419,7 +419,7 @@ public class Mario extends RigidBody {
         if (die) {
             if (!isDead) {
                 assetManager.get("audio/sfx/mariodie.wav", Sound.class).play();
-                body.applyLinearImpulse(new Vector2(0.0f, 12.0f), body.getWorldCenter(), true);
+                body.applyLinearImpulse(new Vector2(0.0f, body.getMass() * (12f -body.getLinearVelocity().y)), body.getWorldCenter(), true);
             }
             isDead = true;
             // do not collide with anything anymore

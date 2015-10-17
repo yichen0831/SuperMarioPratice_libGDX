@@ -3,7 +3,6 @@ package com.ychstudio.screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -41,13 +40,12 @@ public class GameOverScreen implements Screen {
 
         countDown = 4.5f;
 
-        GameManager.instance.getAssetManager().load("audio/music/game_over.ogg", Music.class);
         GameManager.instance.getAssetManager().finishLoading();
     }
 
     @Override
     public void show() {
-        GameManager.instance.getAssetManager().get("audio/music/game_over.ogg", Music.class).play();
+        GameManager.instance.playMusic("game_over.ogg");
 
     }
 

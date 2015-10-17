@@ -81,30 +81,13 @@ public class PlayScreen implements Screen {
     private AssetManager assetManager;
 
     private boolean playingHurryMusic;
+    private boolean playMusic;
 
     private float countDown;
 
     public PlayScreen(SuperMario game) {
         this.game = game;
         assetManager = GameManager.instance.getAssetManager();
-        loadAudio();
-    }
-
-    private void loadAudio() {
-        assetManager.load("audio/music/mario_music.ogg", Music.class);
-        assetManager.load("audio/music/mario_music_hurry.ogg", Music.class);
-        assetManager.load("audio/music/out_of_time.wav", Music.class);
-        assetManager.load("audio/sfx/breakblock.wav", Sound.class);
-        assetManager.load("audio/sfx/bump.wav", Sound.class);
-        assetManager.load("audio/sfx/coin.wav", Sound.class);
-        assetManager.load("audio/sfx/jump_small.wav", Sound.class);
-        assetManager.load("audio/sfx/jump_super.wav", Sound.class);
-        assetManager.load("audio/sfx/mariodie.wav", Sound.class);
-        assetManager.load("audio/sfx/powerdown.wav", Sound.class);
-        assetManager.load("audio/sfx/powerup.wav", Sound.class);
-        assetManager.load("audio/sfx/powerup_spawn.wav", Sound.class);
-        assetManager.load("audio/sfx/stomp.wav", Sound.class);
-        assetManager.finishLoading();
     }
 
     @Override
@@ -156,6 +139,7 @@ public class PlayScreen implements Screen {
         countDown = 3.0f;
 
         playingHurryMusic = false;
+        playMusic = true;
 
     }
 
@@ -173,6 +157,10 @@ public class PlayScreen implements Screen {
 
     public float getMapHeight() {
         return mapHeight;
+    }
+
+    public OrthographicCamera getCamera() {
+        return camera;
     }
 
     public void addSpawnItem(float x, float y, Class<? extends Item> type) {
@@ -209,6 +197,18 @@ public class PlayScreen implements Screen {
 
     public void handleInput() {
 
+        // press M to pause / play music
+        if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+            if (GameManager.instance.isPlayingMusic()) {
+                GameManager.instance.pauseMusic();
+                playMusic = false;
+            }
+            else {
+                GameManager.instance.resumeMusic();
+                playMusic = true;
+            }
+        }
+
         // Press B to toggle Box2DDebuggerRenderer
         if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
             renderB2DDebug = !renderB2DDebug;
@@ -235,28 +235,27 @@ public class PlayScreen implements Screen {
     }
 
     public void handleMusic() {
+        if (!playMusic) {
+            return;
+        }
+
         if (mario.isDead()) {
-            assetManager.get("audio/music/mario_music.ogg", Music.class).stop();
-            assetManager.get("audio/music/mario_music_hurry.ogg", Music.class).stop();
-            assetManager.get("audio/music/out_of_time.wav", Music.class).stop();
+            GameManager.instance.stopMusic();
         }
         else {
             if (hud.getTimeLeft() < 60) {
                 if (!playingHurryMusic) {
-                    assetManager.get("audio/music/mario_music.ogg", Music.class).stop();
-                    assetManager.get("audio/music/out_of_time.wav", Music.class).play();
+                    GameManager.instance.playMusic("out_of_time.wav", false);
                     playingHurryMusic = true;
                 }
                 else {
-                    if (!assetManager.get("audio/music/out_of_time.wav", Music.class).isPlaying()) {
-                        assetManager.get("audio/music/mario_music_hurry.ogg", Music.class).setLooping(true);
-                        assetManager.get("audio/music/mario_music_hurry.ogg", Music.class).play();
+                    if (!GameManager.instance.isPlayingMusic("out_of_time.wav")) {
+                        GameManager.instance.playMusic("mario_music_hurry.ogg");
                     }
                 }
             }
             else {
-                assetManager.get("audio/music/mario_music.ogg", Music.class).setLooping(true);
-                assetManager.get("audio/music/mario_music.ogg", Music.class).play();
+                GameManager.instance.playMusic("mario_music.ogg");
             }
         }
     }

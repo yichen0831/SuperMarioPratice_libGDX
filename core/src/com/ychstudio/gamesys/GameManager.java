@@ -1,6 +1,8 @@
 package com.ychstudio.gamesys;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
@@ -36,6 +38,8 @@ public class GameManager implements Disposable {
     public static final short ITEM_BIT = 1 << 6;
     public static final short FLAGPOLE_BIT = 1 << 7;
 
+    public static final String musicPath = "audio/music/";
+
     private AssetManager assetManager;
 
     private int score;
@@ -51,8 +55,29 @@ public class GameManager implements Disposable {
             assetManager = new AssetManager();
         }
 
+        loadAudio();
+
         score = 0;
     }
+
+    private void loadAudio() {
+        assetManager.load("audio/music/mario_music.ogg", Music.class);
+        assetManager.load("audio/music/mario_music_hurry.ogg", Music.class);
+        assetManager.load("audio/music/out_of_time.wav", Music.class);
+        assetManager.load("audio/music/game_over.ogg", Music.class);
+        assetManager.load("audio/sfx/breakblock.wav", Sound.class);
+        assetManager.load("audio/sfx/bump.wav", Sound.class);
+        assetManager.load("audio/sfx/coin.wav", Sound.class);
+        assetManager.load("audio/sfx/jump_small.wav", Sound.class);
+        assetManager.load("audio/sfx/jump_super.wav", Sound.class);
+        assetManager.load("audio/sfx/mariodie.wav", Sound.class);
+        assetManager.load("audio/sfx/powerdown.wav", Sound.class);
+        assetManager.load("audio/sfx/powerup.wav", Sound.class);
+        assetManager.load("audio/sfx/powerup_spawn.wav", Sound.class);
+        assetManager.load("audio/sfx/stomp.wav", Sound.class);
+        assetManager.finishLoading();
+    }
+
 
     public void gameOver() {
         clearScore();
@@ -76,6 +101,53 @@ public class GameManager implements Disposable {
 
     public AssetManager getAssetManager() {
         return assetManager;
+    }
+
+    private String currentMusic = "";
+
+    public void playMusic(String filename) {
+        playMusic(filename, true);
+    }
+
+    public void playMusic(String filename, boolean loop) {
+        if (!currentMusic.equals(filename)) {
+            stopMusic();
+            currentMusic = filename;
+        }
+
+        if (isPlayingMusic(currentMusic)) {
+            return;
+        }
+        assetManager.get(musicPath + filename, Music.class).setLooping(loop);
+        assetManager.get(musicPath + filename, Music.class).play();
+    }
+
+    public boolean isPlayingMusic() {
+        return isPlayingMusic(currentMusic);
+    }
+
+    public void pauseMusic() {
+        if (currentMusic.length() > 0) {
+            assetManager.get(musicPath + currentMusic, Music.class).pause();
+        }
+    }
+
+    public void resumeMusic() {
+        if (currentMusic.length() > 0) {
+            if (!isPlayingMusic(currentMusic)) {
+                playMusic(currentMusic);
+            }
+        }
+    }
+
+    public void stopMusic() {
+        if (currentMusic.length() > 0) {
+            assetManager.get(musicPath + currentMusic, Music.class).stop();
+        }
+    }
+
+    public boolean isPlayingMusic(String filename) {
+        return assetManager.get(musicPath + filename, Music.class).isPlaying();
     }
 
 
