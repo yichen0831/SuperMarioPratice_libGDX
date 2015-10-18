@@ -572,6 +572,8 @@ public class Mario extends RigidBody {
     public void onCollide(Collider other) {
         if (other.getFilter().categoryBits == GameManager.ENEMY_WEAKNESS_BIT) {
             ((Enemy) other.getUserData()).getDamage(1);
+            float force = body.getMass() * (8.0f - body.getLinearVelocity().y);
+            body.applyLinearImpulse(new Vector2(0.0f, force), body.getWorldCenter(), true);
         }
         else if (other.getFilter().categoryBits == GameManager.ENEMY_LETHAL_BIT) {
             // temporarily invincible when shrinking
@@ -589,6 +591,8 @@ public class Mario extends RigidBody {
         }
         else if (other.getFilter().categoryBits == GameManager.ENEMY_INTERACT_BIT) {
             ((Enemy) other.getUserData()).interact(this);
+            float force = body.getMass() * (8.0f - body.getLinearVelocity().y);
+            body.applyLinearImpulse(new Vector2(0.0f, force), body.getWorldCenter(), true);
         }
         else if (other.getFilter().categoryBits == GameManager.ITEM_BIT) {
             Item item = (Item) other.getUserData();

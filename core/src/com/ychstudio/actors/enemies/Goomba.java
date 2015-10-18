@@ -256,7 +256,6 @@ public class Goomba extends Enemy {
         polygonShape.set(vertices);
 
         fixtureDef.shape = polygonShape;
-        fixtureDef.restitution = 0.6f;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_WEAKNESS_BIT;
         fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
 
