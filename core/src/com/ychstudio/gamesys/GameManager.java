@@ -36,7 +36,8 @@ public class GameManager implements Disposable {
     public static final short ENEMY_WEAKNESS_BIT = 1 << 4;
     public static final short ENEMY_INTERACT_BIT = 1 << 5;
     public static final short ITEM_BIT = 1 << 6;
-    public static final short FLAGPOLE_BIT = 1 << 7;
+    public static final short WEAPON_BIT = 1 << 7;
+    public static final short FLAGPOLE_BIT = 1 << 8;
 
     public static final String musicPath = "audio/music/";
 
@@ -75,6 +76,8 @@ public class GameManager implements Disposable {
         assetManager.load("audio/sfx/powerup.wav", Sound.class);
         assetManager.load("audio/sfx/powerup_spawn.wav", Sound.class);
         assetManager.load("audio/sfx/stomp.wav", Sound.class);
+        assetManager.load("audio/sfx/fireball.ogg", Sound.class);
+        assetManager.load("audio/sfx/kick.ogg", Sound.class);
         assetManager.finishLoading();
     }
 

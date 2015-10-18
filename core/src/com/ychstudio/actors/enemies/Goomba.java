@@ -3,6 +3,7 @@ package com.ychstudio.actors.enemies;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
@@ -126,7 +127,12 @@ public class Goomba extends Enemy {
             body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
             becomeDead();
 
-            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            float cameraX = playScreen.getCamera().position.x;
+            float distanceRatio = (body.getPosition().x - cameraX) / GameManager.V_WIDTH * 2;
+            float pan = MathUtils.clamp(distanceRatio, -1, 1);
+            float volume = MathUtils.clamp(2.0f - (float)Math.sqrt(Math.abs(distanceRatio)), 0, 1);
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play(volume, 1.0f, pan);
+
             GameManager.instance.addScore(100);
         }
         else if (walk) {
@@ -228,7 +234,7 @@ public class Goomba extends Enemy {
 
         fixtureDef.shape = edgeShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_LETHAL_BIT;
-        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.MARIO_BIT | GameManager.WEAPON_BIT;
         body.createFixture(fixtureDef).setUserData(this);
 
 
@@ -239,7 +245,7 @@ public class Goomba extends Enemy {
 
         fixtureDef.shape = circleShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_LETHAL_BIT;
-        fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.MARIO_BIT | GameManager.WEAPON_BIT;
         body.createFixture(fixtureDef).setUserData(this);
 
         circleShape.setPosition(new Vector2(6, 0).scl(1 / GameManager.PPM));
@@ -257,7 +263,7 @@ public class Goomba extends Enemy {
 
         fixtureDef.shape = polygonShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_WEAKNESS_BIT;
-        fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.MARIO_BIT | GameManager.WEAPON_BIT;
 
         body.createFixture(fixtureDef).setUserData(this);
 

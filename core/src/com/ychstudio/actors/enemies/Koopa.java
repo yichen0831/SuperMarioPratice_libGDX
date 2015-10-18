@@ -78,6 +78,7 @@ public class Koopa extends Enemy {
         awake = false;
         walk = true;
 
+        currentState = State.WALKING;
     }
 
     private void becomeShell() {
@@ -200,7 +201,7 @@ public class Koopa extends Enemy {
         else if (spin) {
             spin = false;
             becomeNoraml();
-            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.getAssetManager().get("audio/sfx/kick.ogg", Sound.class).play();
             GameManager.instance.addScore(500);
             currentState = State.SPINNING;
         }
@@ -307,7 +308,7 @@ public class Koopa extends Enemy {
 
         fixtureDef.shape = edgeShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_LETHAL_BIT;
-        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.GROUND_BIT | GameManager.MARIO_BIT | GameManager.WEAPON_BIT;
         feetFixture = body.createFixture(fixtureDef);
         feetFixture.setUserData(this);
 
@@ -318,7 +319,7 @@ public class Koopa extends Enemy {
 
         fixtureDef.shape = circleShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_LETHAL_BIT;
-        fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.MARIO_BIT | GameManager.WEAPON_BIT;
         lethalFixture0 = body.createFixture(fixtureDef);
         lethalFixture0.setUserData(this);
 
@@ -338,7 +339,7 @@ public class Koopa extends Enemy {
 
         fixtureDef.shape = polygonShape;
         fixtureDef.filter.categoryBits = GameManager.ENEMY_WEAKNESS_BIT;
-        fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
+        fixtureDef.filter.maskBits = GameManager.MARIO_BIT | GameManager.WEAPON_BIT;
 
         weakFixture = body.createFixture(fixtureDef);
         weakFixture.setUserData(this);

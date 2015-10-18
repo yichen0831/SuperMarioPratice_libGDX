@@ -3,9 +3,6 @@ package com.ychstudio.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -32,6 +29,8 @@ import com.ychstudio.actors.items.Item;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.actors.items.SpawningItem;
 import com.ychstudio.actors.maptiles.MapTileObject;
+import com.ychstudio.actors.weapons.Fireball;
+import com.ychstudio.actors.weapons.SpawningFireball;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.hud.Hud;
 import com.ychstudio.utils.WorldContactListener;
@@ -59,7 +58,7 @@ public class PlayScreen implements Screen {
     private OrthogonalTiledMapRenderer mapRenderer;
 
     private float mapWidth;
-    private float mapHeight;
+//    private float mapHeight; // currently not used
 
     private TextureAtlas textureAtlas;
 
@@ -75,11 +74,12 @@ public class PlayScreen implements Screen {
     private Array<Effect> effects;
     private LinkedList<SpawningEffect> effectSpawnQueue;
 
+    private Array<Fireball> fireballs;
+    private LinkedList<SpawningFireball> fireballSpawnQueue;
+
     private Mario mario;
 
     private Hud hud;
-
-    private AssetManager assetManager;
 
     private boolean playingHurryMusic;
     private boolean playMusic;
@@ -88,7 +88,6 @@ public class PlayScreen implements Screen {
 
     public PlayScreen(SuperMario game) {
         this.game = game;
-        assetManager = GameManager.instance.getAssetManager();
     }
 
     @Override
@@ -113,7 +112,7 @@ public class PlayScreen implements Screen {
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap, 1 / GameManager.PPM);
 
         mapWidth = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();
-        mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight();
+//        mapHeight = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight(); // currently not used
 
         // create world from TmxTiledMap
         WorldCreator worldCreator = new WorldCreator(this, tiledMap);
@@ -128,6 +127,11 @@ public class PlayScreen implements Screen {
         // for spawning effect
         effects = new Array<Effect>();
         effectSpawnQueue = new LinkedList<SpawningEffect>();
+
+        // for spawning fireball
+        fireballs = new Array<Fireball>();
+        fireballSpawnQueue = new LinkedList<SpawningFireball>();
+
 
         hud = new Hud(game.batch);
         hud.setLevel("1-1");
@@ -156,9 +160,11 @@ public class PlayScreen implements Screen {
         return mapWidth;
     }
 
+    /* currently not used
     public float getMapHeight() {
         return mapHeight;
     }
+    */
 
     public OrthographicCamera getCamera() {
         return camera;
@@ -196,6 +202,17 @@ public class PlayScreen implements Screen {
             else if (spawningEffect.type == BrickDebris.class) {
                 effects.add(new BrickDebris(this, spawningEffect.x, spawningEffect.y));
             }
+        }
+    }
+
+    public void addSpawnFireball(float x, float y, boolean movingRight) {
+        fireballSpawnQueue.add(new SpawningFireball(x, y, movingRight));
+    }
+
+    public void handleSpawningFireball() {
+        if (fireballSpawnQueue.size() > 0) {
+            SpawningFireball spawningFireball = fireballSpawnQueue.poll();
+            fireballs.add(new Fireball(this, spawningFireball.x, spawningFireball.y, spawningFireball.movingRight));
         }
     }
 
@@ -271,6 +288,7 @@ public class PlayScreen implements Screen {
         handleInput();
         handleSpawningItem();
         handleSpawningEffect();
+        handleSpawningFireball();
         handleMusic();
 
         if (hud.getTimeLeft() == 0) {
@@ -304,6 +322,11 @@ public class PlayScreen implements Screen {
             effect.update(delta);
         }
 
+        // update fireballs
+        for (Fireball fireball : fireballs) {
+            fireball.update(delta);
+        }
+
         // update Mario
         mario.update(delta);
 
@@ -332,7 +355,7 @@ public class PlayScreen implements Screen {
         // update HUD
         hud.update(delta);
 
-//        cleanUpDestroyedObjects(); // do not need to clean yet as performance concerns
+        cleanUpDestroyedObjects();
 
 
         // check if Mario is dead
@@ -348,11 +371,13 @@ public class PlayScreen implements Screen {
     }
 
     private void cleanUpDestroyedObjects() {
+        /*
         for (int i = 0; i < mapTileObjects.size; i++) {
             if (mapTileObjects.get(i).isDestroyed()) {
                 mapTileObjects.removeIndex(i);
             }
         }
+        */
 
         for (int i = 0; i < items.size; i++) {
             if (items.get(i).isDestroyed()) {
@@ -360,9 +385,17 @@ public class PlayScreen implements Screen {
             }
         }
 
+        /*
         for (int i = 0; i < effects.size; i++) {
             if (effects.get(i).isDestroyed()) {
                 effects.removeIndex(i);
+            }
+        }
+        */
+
+        for (int i = 0; i < fireballs.size; i++) {
+            if (fireballs.get(i).isDestroyed()) {
+                fireballs.removeIndex(i);
             }
         }
     }
@@ -400,6 +433,11 @@ public class PlayScreen implements Screen {
         // draw enemies
         for (Enemy enemy : enemies) {
             enemy.draw(game.batch);
+        }
+
+        // draw fireballs
+        for (Fireball fireball : fireballs) {
+            fireball.draw(game.batch);
         }
 
         // draw Mario

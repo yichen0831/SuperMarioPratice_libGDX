@@ -88,6 +88,9 @@ public class Mario extends RigidBody {
     private boolean bigJump = false;
     private float jumpSoundTimer = 0f;
 
+    private final float fireInterval = 0.3f;
+    private float fireTimer = 0f;
+
     private AssetManager assetManager;
 
     public Mario(PlayScreen playScreen, float x, float y) {
@@ -321,6 +324,15 @@ public class Mario extends RigidBody {
             force = fastForce;
         }
 
+        // Fire fireball
+        if (Gdx.input.isKeyJustPressed(Input.Keys.X) && isFireMario && fireTimer > fireInterval && currentState != State.CROUCHING) {
+            float x = facingRight ? 0.8f : -0.8f;
+            float y = 0.8f;
+            GameManager.instance.getAssetManager().get("audio/sfx/fireball.ogg", Sound.class).play();
+            playScreen.addSpawnFireball(body.getPosition().x + x, body.getPosition().y + y, facingRight);
+            fireTimer = 0;
+        }
+
         // Jump
         if ((Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Keys.C)) && grounded) {
             body.applyLinearImpulse(new Vector2(0.0f, 16.0f), body.getWorldCenter(), true);
@@ -433,6 +445,7 @@ public class Mario extends RigidBody {
         checkGrounded();
 
         jumpSoundTimer += delta;
+        fireTimer += delta;
 
         // die when falling below ground
         if (body.getPosition().y < -2.0f) {
