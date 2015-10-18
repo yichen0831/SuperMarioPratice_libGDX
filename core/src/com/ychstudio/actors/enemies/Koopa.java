@@ -173,6 +173,13 @@ public class Koopa extends Enemy {
             return;
         }
 
+        if (playScreen.getMarioPosition().x + GameManager.V_WIDTH / 2 > body.getPosition().x )
+            active = true;
+
+        if (!active) {
+            return;
+        }
+
         State previousState = currentState;
 
         if (die) {

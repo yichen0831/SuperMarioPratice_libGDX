@@ -18,13 +18,23 @@ import com.ychstudio.screens.PlayScreen;
  */
 public class Goomba extends Enemy {
 
+    public enum State {
+        WALKING,
+        STOMPED,
+        DYING,
+    }
+
     private Animation walking;
     private float stateTime;
 
     private boolean movingRight;
     private float speed;
 
-    private boolean stomped = false;
+    private State currentState;
+
+    private boolean walk;
+    private boolean stomped;
+    private boolean die;
 
     public Goomba(PlayScreen playScreen, float x, float y) {
         super(playScreen, x, y);
@@ -43,6 +53,9 @@ public class Goomba extends Enemy {
         speed = 3.2f;
         stateTime = 0;
 
+        walk = true;
+        stomped = false;
+        die = false;
     }
 
     public void checkMovingDirection() {
@@ -78,6 +91,17 @@ public class Goomba extends Enemy {
 
     @Override
     public void update(float delta) {
+        if (destroyed) {
+            return;
+        }
+
+        if (toBeDestroyed) {
+            world.destroyBody(body);
+            setBounds(0, 0, 0, 0);
+            destroyed = true;
+            return;
+        }
+
         if (playScreen.getMarioPosition().x + GameManager.V_WIDTH / 2 > body.getPosition().x )
             active = true;
 
@@ -85,37 +109,88 @@ public class Goomba extends Enemy {
             return;
         }
 
-        if (destroyed) {
-            return;
+        State previousState = currentState;
+
+        if (stomped) {
+            stomped = false;
+            currentState = State.STOMPED;
+            becomeStomped();
+
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.addScore(200);
+        }
+        else if (die) {
+            die = false;
+            currentState = State.DYING;
+
+            body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
+            becomeDead();
+
+            GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
+            GameManager.instance.addScore(200);
+        }
+        else if (walk) {
+            walk = false;
+            currentState = State.WALKING;
+        }
+
+        if (previousState != currentState) {
+            stateTime = 0;
+        }
+
+        switch (currentState) {
+            case STOMPED:
+                setRegion(new TextureRegion(textureAtlas.findRegion("Goomba"), 16 * 2, 0, 16, 16));
+                if (stateTime > 1.0f) {
+                    queueDestroy();
+                }
+                break;
+
+            case DYING:
+                setRegion(walking.getKeyFrame(stateTime, true));
+                setFlip(false, true);
+                if (stateTime > 2.0f) {
+                    queueDestroy();
+                }
+                break;
+
+            case WALKING:
+            default:
+                setRegion(walking.getKeyFrame(stateTime, true));
+                checkMovingDirection();
+
+                float velocityY = body.getLinearVelocity().y;
+                if (movingRight) {
+                    body.setLinearVelocity(new Vector2(speed, velocityY));
+                }
+                else {
+                    body.setLinearVelocity(new Vector2(-speed, velocityY));
+                }
+                break;
         }
 
         stateTime += delta;
 
-        if (toBeDestroyed) {
-            if (stomped) {
-                setRegion(new TextureRegion(textureAtlas.findRegion("Goomba"), 16 * 2, 0, 16, 16));
-            }
-
-            if (stateTime > 1.0f) {
-                world.destroyBody(body);
-                setBounds(0, 0, 0, 0);
-                destroyed = true;
-                return;
-            }
-        }
-        else {
-            setRegion(walking.getKeyFrame(stateTime, true));
-            checkMovingDirection();
-
-            float velocityY = body.getLinearVelocity().y;
-            if (movingRight) {
-                body.setLinearVelocity(new Vector2(speed, velocityY));
-            }
-            else {
-                body.setLinearVelocity(new Vector2(-speed, velocityY));
-            }
-        }
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
+    }
+
+
+    private void becomeStomped() {
+        Filter filter = new Filter();
+        filter.maskBits = GameManager.GROUND_BIT;
+        for (Fixture fixture : body.getFixtureList()) {
+            fixture.setFilterData(filter);
+        }
+    }
+
+    private void becomeDead() {
+        Filter filter;
+        for (Fixture fixture : body.getFixtureList()) {
+            filter = fixture.getFilterData();
+            filter.categoryBits = GameManager.NOTHING_BIT;
+            filter.maskBits = GameManager.NOTHING_BIT;
+            fixture.setFilterData(filter);
+        }
     }
 
     @Override
@@ -126,28 +201,12 @@ public class Goomba extends Enemy {
 
         // hit by Mario on head
         if (damage == 1) {
-            Filter filter = new Filter();
-            filter.maskBits = GameManager.GROUND_BIT;
-            for (Fixture fixture : body.getFixtureList()) {
-                fixture.setFilterData(filter);
-            }
             stomped = true;
-
         }
         else {
-            Filter filter = new Filter();
-            filter.maskBits = GameManager.NOTHING_BIT;
-            for (Fixture fixture : body.getFixtureList()) {
-                fixture.setFilterData(filter);
-            }
-            body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
-            setFlip(false, true);
+            die = true;
         }
 
-        stateTime = 0;
-        GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-        GameManager.instance.addScore(200);
-        queueDestroy();
     }
 
     @Override
