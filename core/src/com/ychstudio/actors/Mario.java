@@ -68,6 +68,9 @@ public class Mario extends RigidBody {
     private Animation growing;
     private Animation fireMarioing;
     private Animation shrinking;
+    private Animation firingAnimation;
+
+    private boolean showFiringAnimation;
 
     private boolean facingRight;
 
@@ -149,6 +152,13 @@ public class Mario extends RigidBody {
         }
         fireMarioing = new Animation(0.1f, keyFrames);
 
+        // firing animation
+        keyFrames.clear();
+        for (int i = 16; i < 19; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * i, 0, 16, 32));
+        }
+        firingAnimation = new Animation(0.1f, keyFrames);
+
         keyFrames.clear();
         // shrinking animation
         for (int i = 0; i < 3; i++) {
@@ -177,6 +187,8 @@ public class Mario extends RigidBody {
         shrink = false;
         growUp = false;
         crouch = false;
+
+        showFiringAnimation = false;
 
         keyPressedTime = 99.0f;
 
@@ -331,6 +343,7 @@ public class Mario extends RigidBody {
             GameManager.instance.getAssetManager().get("audio/sfx/fireball.ogg", Sound.class).play();
             playScreen.addSpawnFireball(body.getPosition().x + x, body.getPosition().y + y, facingRight);
             fireTimer = 0;
+            showFiringAnimation = true;
         }
 
         // Jump
@@ -446,6 +459,10 @@ public class Mario extends RigidBody {
 
         jumpSoundTimer += delta;
         fireTimer += delta;
+
+        if (fireTimer > 0.1f) {
+            showFiringAnimation = false;
+        }
 
         // die when falling below ground
         if (body.getPosition().y < -2.0f) {
@@ -578,7 +595,12 @@ public class Mario extends RigidBody {
             case RUNNING:
                 if (isGrownUp) {
                     if (isFireMario) {
-                        setRegion(runningFireMario.getKeyFrame(stateTime, true));
+                        if (showFiringAnimation) {
+                            setRegion(firingAnimation.getKeyFrame(stateTime, true));
+                        }
+                        else {
+                            setRegion(runningFireMario.getKeyFrame(stateTime, true));
+                        }
                     }
                     else {
                         setRegion(runningBig.getKeyFrame(stateTime, true));
@@ -592,7 +614,12 @@ public class Mario extends RigidBody {
             case BRAKING:
                 if (isGrownUp) {
                     if (isFireMario) {
-                        setRegion(brakingFireMario);
+                        if (showFiringAnimation) {
+                            setRegion(firingAnimation.getKeyFrame(0, true));
+                        }
+                        else {
+                            setRegion(brakingFireMario);
+                        }
                     }
                     else {
                         setRegion(brakingBig);
@@ -606,7 +633,12 @@ public class Mario extends RigidBody {
             case JUMPING:
                 if (isGrownUp) {
                     if (isFireMario) {
-                        setRegion(jumpingFireMario);
+                        if (showFiringAnimation) {
+                            setRegion(firingAnimation.getKeyFrame(0, true));
+                        }
+                        else {
+                            setRegion(jumpingFireMario);
+                        }
                     }
                     else {
                         setRegion(jumpingBig);
@@ -622,7 +654,12 @@ public class Mario extends RigidBody {
             default:
                 if (isGrownUp) {
                     if (isFireMario) {
-                        setRegion(standingFireMario);
+                        if (showFiringAnimation) {
+                            setRegion(firingAnimation.getKeyFrame(0, true));
+                        }
+                        else {
+                            setRegion(standingFireMario);
+                        }
                     }
                     else {
                         setRegion(standingBig);
