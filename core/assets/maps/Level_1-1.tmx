@@ -535,7 +535,7 @@
   <object id="461" gid="2" x="1456" y="96" width="16" height="16"/>
   <object id="462" gid="2" x="1472" y="160" width="16" height="16">
    <properties>
-    <property name="hitpoint" value="10"/>
+    <property name="multihit" value="10"/>
    </properties>
   </object>
   <object id="463" gid="2" x="1568" y="160" width="16" height="16"/>

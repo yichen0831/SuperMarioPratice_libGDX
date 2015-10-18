@@ -117,7 +117,7 @@ public class Goomba extends Enemy {
             becomeStomped();
 
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-            GameManager.instance.addScore(200);
+            GameManager.instance.addScore(100);
         }
         else if (die) {
             die = false;
@@ -127,7 +127,7 @@ public class Goomba extends Enemy {
             becomeDead();
 
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-            GameManager.instance.addScore(200);
+            GameManager.instance.addScore(100);
         }
         else if (walk) {
             walk = false;

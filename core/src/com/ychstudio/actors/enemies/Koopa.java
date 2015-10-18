@@ -187,21 +187,21 @@ public class Koopa extends Enemy {
             body.applyLinearImpulse(new Vector2(0.0f, 7.2f), body.getWorldCenter(), true);
             becomeDead();
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-            GameManager.instance.addScore(200);
+            GameManager.instance.addScore(500);
             currentState = State.DYING;
         }
         else if (shell) {
             shell = false;
             becomeShell();
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-            GameManager.instance.addScore(200);
+            GameManager.instance.addScore(500);
             currentState = State.SHELLING;
         }
         else if (spin) {
             spin = false;
             becomeNoraml();
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
-            GameManager.instance.addScore(200);
+            GameManager.instance.addScore(500);
             currentState = State.SPINNING;
         }
         else if (awake) {

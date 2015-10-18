@@ -2,12 +2,14 @@ package com.ychstudio.actors.maptiles;
 
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.ychstudio.actors.Collider;
 import com.ychstudio.actors.Mario;
 import com.ychstudio.actors.effects.BrickDebris;
+import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.gamesys.GameManager;
@@ -20,9 +22,14 @@ import com.ychstudio.screens.PlayScreen;
  */
 public class Brick extends MapTileObject {
 
+    private final TextureRegion unhitableTextureRegion;
+    private boolean hitable;
     private boolean hit;
     private boolean explode;
     private boolean lethal;
+
+    private boolean multihit = false;
+    private int hitCount = 0;
 
     private float stateTime;
 
@@ -40,8 +47,19 @@ public class Brick extends MapTileObject {
 
         targetPosition = originalPosition;
 
+        TiledMap tiledMap = playScreen.getTiledMap();
+        unhitableTextureRegion = tiledMap.getTileSets().getTileSet(0).getTile(28).getTextureRegion();
+
         debris = new TextureRegion(playScreen.getTextureAtlas().findRegion("Debris"), 0, 0, 16, 16);
 
+        if (mapObject.getProperties().containsKey("multihit")) {
+            hitCount = Integer.parseInt(mapObject.getProperties().get("multihit", String.class));
+            if (hitCount > 0) {
+                multihit = true;
+            }
+        }
+
+        hitable = true;
         hit = false;
         lethal = false;
         explode = false;
@@ -93,7 +111,7 @@ public class Brick extends MapTileObject {
         }
         else {
             body.setTransform(targetPosition, 0);
-            if (hit) {
+            if (hit || !hitable) {
                 hit = false;
                 targetPosition = originalPosition;
             }
@@ -135,6 +153,10 @@ public class Brick extends MapTileObject {
             }
         }
 
+        if (!hitable) {
+            setRegion(unhitableTextureRegion);
+        }
+
         setPosition(body.getPosition().x - getWidth() / 2, body.getPosition().y - getHeight() / 2);
 
     }
@@ -144,22 +166,42 @@ public class Brick extends MapTileObject {
     public void onTrigger(Collider other) {
 
         if (other.getFilter().categoryBits == GameManager.MARIO_HEAD_BIT) {
+
+            if (!hitable) {
+                GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();
+                return;
+            }
+
             targetPosition = movablePosition;
 
-            if (((Mario)other.getUserData()).isGrownUp()) {
-                GameManager.instance.getAssetManager().get("audio/sfx/breakblock.wav", Sound.class).play();
-                GameManager.instance.addScore(200);
-                hit = true;
-                lethal = true;
-                explode = true;
-                stateTime = 0;
+            if (multihit) {
+                if (hitCount > 0) {
+                    playScreen.addSpawnEffect(body.getPosition().x, body.getPosition().y + 1.0f, FlippingCoin.class);
+                    GameManager.instance.getAssetManager().get("audio/sfx/coin.wav", Sound.class).play();
+                    GameManager.instance.addScore(200);
+                    hitCount--;
+                    hit = true;
+                    lethal = true;
+                }
+                else {
+                    hitable = false;
+                }
             }
             else {
-                GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();
-                hit = true;
-                lethal = true;
-            }
 
+                if (((Mario) other.getUserData()).isGrownUp()) {
+                    GameManager.instance.getAssetManager().get("audio/sfx/breakblock.wav", Sound.class).play();
+                    GameManager.instance.addScore(50);
+                    hit = true;
+                    lethal = true;
+                    explode = true;
+                    stateTime = 0;
+                } else {
+                    GameManager.instance.getAssetManager().get("audio/sfx/bump.wav", Sound.class).play();
+                    hit = true;
+                    lethal = true;
+                }
+            }
         }
     }
 }
