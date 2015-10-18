@@ -27,6 +27,7 @@ import com.ychstudio.actors.effects.Effect;
 import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.effects.SpawningEffect;
 import com.ychstudio.actors.enemies.Enemy;
+import com.ychstudio.actors.items.Flower;
 import com.ychstudio.actors.items.Item;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.actors.items.SpawningItem;
@@ -173,6 +174,9 @@ public class PlayScreen implements Screen {
 
             if (spawningItem.type == Mushroom.class) {
                 items.add(new Mushroom(this, spawningItem.x, spawningItem.y));
+            }
+            else if (spawningItem.type == Flower.class) {
+                items.add(new Flower(this, spawningItem.x, spawningItem.y));
             }
 
         }

@@ -9,8 +9,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.ychstudio.actors.Collider;
+import com.ychstudio.actors.Mario;
 import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.enemies.Enemy;
+import com.ychstudio.actors.items.Flower;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
@@ -147,7 +149,13 @@ public class CoinBlock extends MapTileObject {
                 targetPosition = movablePosition;
 
                 if (mapObject.getProperties().containsKey("mushroom")) {
-                    playScreen.addSpawnItem(body.getPosition().x, body.getPosition().y + 16 / GameManager.PPM, Mushroom.class);
+                    // if Mario is small, generate a mushroom, otherwise generate a flower
+                    if (((Mario) other.getUserData()).isGrownUp()) {
+                        playScreen.addSpawnItem(body.getPosition().x, body.getPosition().y + 16 / GameManager.PPM, Flower.class);
+                    }
+                    else {
+                        playScreen.addSpawnItem(body.getPosition().x, body.getPosition().y + 16 / GameManager.PPM, Mushroom.class);
+                    }
                     GameManager.instance.getAssetManager().get("audio/sfx/powerup_spawn.wav", Sound.class).play();
                 }
                 else {

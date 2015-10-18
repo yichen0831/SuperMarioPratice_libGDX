@@ -31,6 +31,7 @@ public class Mario extends RigidBody {
         SHRINKING,
         BRAKING,
         DYING,
+        FIREMARIOING,
     }
 
     private final float radius = 6.8f / GameManager.PPM;
@@ -51,19 +52,27 @@ public class Mario extends RigidBody {
     private Animation runningSmall;
     private TextureRegion brakingSmall;
 
-    private TextureRegion dying;
     private TextureRegion standingBig;
     private TextureRegion jumpingBig;
     private Animation runningBig;
     private TextureRegion brakingBig;
+    private TextureRegion crouchingBig;
 
+    private TextureRegion standingFireMario;
+    private TextureRegion jumpingFireMario;
+    private Animation runningFireMario;
+    private TextureRegion brakingFireMario;
+    private TextureRegion crouchingFireMario;
+
+    private TextureRegion dying;
     private Animation growing;
+    private Animation fireMarioing;
     private Animation shrinking;
-    private TextureRegion crouching;
 
     private boolean facingRight;
 
     private boolean isGrownUp;
+    private boolean isFireMario;
     private boolean isDead;
 
     private boolean grounded;
@@ -73,6 +82,7 @@ public class Mario extends RigidBody {
     private boolean shrink;
     private boolean crouch;
     private boolean brake;
+    private boolean fireMario;
 
     private boolean smallJump = false;
     private boolean bigJump = false;
@@ -86,16 +96,20 @@ public class Mario extends RigidBody {
 
         standingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 0, 0, 16, 16);
         standingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32);
+        standingFireMario = new TextureRegion(textureAtlas.findRegion("FireMario"), 0, 0, 16, 32);
 
         jumpingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 5, 0, 16, 16);
         jumpingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 5, 0, 16, 32);
+        jumpingFireMario = new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * 5, 0, 16, 32);
 
         brakingSmall = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 4, 0, 16, 16);
         brakingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 4, 0, 16, 32);
+        brakingFireMario = new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * 4, 0, 16, 32);
 
         // flip braking image for correct displaying
         brakingSmall.flip(true, false);
         brakingBig.flip(true, false);
+        brakingFireMario.flip(true, false);
 
         // running animation
         Array<TextureRegion> keyFrames = new Array<TextureRegion>();
@@ -111,12 +125,26 @@ public class Mario extends RigidBody {
         runningBig = new Animation(0.1f, keyFrames);
 
         keyFrames.clear();
+        for (int i = 1; i < 4; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * i, 0, 16, 32));
+        }
+        runningFireMario = new Animation(0.1f, keyFrames);
+
+        keyFrames.clear();
         // growing up animation
         for (int i = 0; i < 4; i++) {
             keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 15, 0, 16, 32));
             keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32));
         }
         growing = new Animation(0.1f, keyFrames);
+
+        keyFrames.clear();
+        // becoming FireMario animation
+        for (int i = 0; i < 4; i++) {
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * 15, 0, 16, 32));
+            keyFrames.add(new TextureRegion(textureAtlas.findRegion("FireMario"), 0, 0, 16, 32));
+        }
+        fireMarioing = new Animation(0.1f, keyFrames);
 
         keyFrames.clear();
         // shrinking animation
@@ -129,7 +157,8 @@ public class Mario extends RigidBody {
 
         dying = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 6, 0, 16, 16);
 
-        crouching = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 6, 0, 16, 32);
+        crouchingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 6, 0, 16, 32);
+        crouchingFireMario = new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * 6, 0, 16, 32);
 
         setRegion(standingSmall);
         setBounds(getX(), getY(), 16 / GameManager.PPM, 16 / GameManager.PPM);
@@ -139,6 +168,7 @@ public class Mario extends RigidBody {
 
         facingRight = true;
         isGrownUp = false;
+        isFireMario = false;
         jump = false;
         die = false;
         shrink = false;
@@ -358,7 +388,7 @@ public class Mario extends RigidBody {
     }
 
     public boolean isGrownUp() {
-        return isGrownUp;
+        return isGrownUp || isFireMario;
     }
 
     public boolean isDead() {
@@ -441,10 +471,17 @@ public class Mario extends RigidBody {
         else if (shrink) {
             currentState = State.SHRINKING;
             isGrownUp = false;
+            isFireMario = false;
         }
         else if (growUp) {
             currentState = State.GROWING;
             isGrownUp = true;
+            setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 32 / GameManager.PPM);
+        }
+        else if (fireMario) {
+            currentState = State.FIREMARIOING;
+            isGrownUp = true;
+            isFireMario = true;
             setBounds(body.getPosition().x, body.getPosition().y, 16 / GameManager.PPM, 32 / GameManager.PPM);
         }
         else if (crouch) {
@@ -483,6 +520,7 @@ public class Mario extends RigidBody {
                 setRegion(dying);
                 setSize(16 / GameManager.PPM, 16 / GameManager.PPM);
                 break;
+
             case SHRINKING:
                 setRegion(shrinking.getKeyFrame(stateTime, false));
                 // temporarily not collide with enemies
@@ -498,9 +536,16 @@ public class Mario extends RigidBody {
                     defSmallMario();
                 }
                 break;
+
             case CROUCHING:
-                setRegion(crouching);
+                if (isFireMario) {
+                    setRegion(crouchingFireMario);
+                }
+                else {
+                    setRegion(crouchingBig);
+                }
                 break;
+
             case GROWING:
                 setRegion(growing.getKeyFrame(stateTime, false));
                 if (growing.isAnimationFinished(stateTime)) {
@@ -508,35 +553,67 @@ public class Mario extends RigidBody {
                     defBigMario();
                 }
                 break;
+
+            case FIREMARIOING:
+                setRegion(fireMarioing.getKeyFrame(stateTime, false));
+                if (fireMarioing.isAnimationFinished(stateTime)) {
+                    fireMario = false;
+                    defBigMario();
+                }
+                break;
+
             case RUNNING:
                 if (isGrownUp) {
-                    setRegion(runningBig.getKeyFrame(stateTime, true));
+                    if (isFireMario) {
+                        setRegion(runningFireMario.getKeyFrame(stateTime, true));
+                    }
+                    else {
+                        setRegion(runningBig.getKeyFrame(stateTime, true));
+                    }
                 }
                 else {
                     setRegion(runningSmall.getKeyFrame(stateTime, true));
                 }
                 break;
+
             case BRAKING:
                 if (isGrownUp) {
-                    setRegion(brakingBig);
+                    if (isFireMario) {
+                        setRegion(brakingFireMario);
+                    }
+                    else {
+                        setRegion(brakingBig);
+                    }
                 }
                 else {
                     setRegion(brakingSmall);
                 }
                 break;
+
             case JUMPING:
                 if (isGrownUp) {
-                    setRegion(jumpingBig);
+                    if (isFireMario) {
+                        setRegion(jumpingFireMario);
+                    }
+                    else {
+                        setRegion(jumpingBig);
+                    }
                 }
                 else {
                     setRegion(jumpingSmall);
                 }
                 break;
+
             case FALLING:
             case STANDING:
             default:
                 if (isGrownUp) {
-                    setRegion(standingBig);
+                    if (isFireMario) {
+                        setRegion(standingFireMario);
+                    }
+                    else {
+                        setRegion(standingBig);
+                    }
                 }
                 else {
                     setRegion(standingSmall);
@@ -606,6 +683,16 @@ public class Mario extends RigidBody {
                     assetManager.get("audio/sfx/stomp.wav", Sound.class).play();
                 }
 
+            }
+            else if (item.getName().equals("flower")) {
+                if (!isFireMario) {
+                    assetManager.get("audio/sfx/powerup.wav", Sound.class).play();
+                    fireMario = true;
+                }
+                else {
+                    assetManager.get("audio/sfx/stomp.wav", Sound.class).play();
+
+                }
             }
 
         }
