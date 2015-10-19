@@ -8,8 +8,8 @@ import com.ychstudio.gamesys.GameManager;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.width = GameManager.WINDOW_WIDTH;
-		config.height = GameManager.WINDOW_HEIGHT;
+		config.width = 800;
+		config.height = 600;
 		new LwjglApplication(new SuperMario(), config);
 	}
 }

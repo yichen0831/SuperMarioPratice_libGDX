@@ -1,5 +1,6 @@
 package com.ychstudio.gamesys;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -18,8 +19,8 @@ public class GameManager implements Disposable {
 
     public static final float PPM = 16;
 
-    public static final int WINDOW_WIDTH = 800;
-    public static final int WINDOW_HEIGHT = 600;
+    public static final int WINDOW_WIDTH = Gdx.graphics.getWidth();
+    public static final int WINDOW_HEIGHT = Gdx.graphics.getHeight();
 
     public static final float V_WIDTH = 20.0f;
     public static final float V_HEIGHT = 15.0f;

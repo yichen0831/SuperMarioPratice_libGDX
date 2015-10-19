@@ -557,6 +557,28 @@ public class Mario extends RigidBody {
 
     }
 
+    public void invincibleKill() {
+        Vector2 p1;
+        Vector2 p2;
+
+        RayCastCallback rayCastCallback = new RayCastCallback() {
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                if (fraction <= 1 && fixture.getUserData() instanceof Enemy) {
+                    ((Enemy) fixture.getUserData()).getDamage(3);
+                    return 0;
+                }
+                return -1;
+            }
+        };
+
+        for (int i = 0; i < 2; i++) {
+            p1 = new Vector2(body.getPosition().x - (i==0 ? -radius : radius), body.getPosition().y);
+            p2 = new Vector2(p1.x - (i==0 ? -0.1f :0.1f), p1.y);
+            world.rayCast(rayCastCallback, p1, p2);
+        }
+    }
+
     @Override
     public void update(float delta) {
         checkGrounded();
@@ -565,6 +587,7 @@ public class Mario extends RigidBody {
         fireTimer += delta;
 
         if (isInvincible) {
+            invincibleKill();
             invincibleCountDown -= delta;
             if (invincibleCountDown <= 0) {
                 isInvincible = false;
