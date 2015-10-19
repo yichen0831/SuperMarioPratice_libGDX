@@ -46,5 +46,6 @@ public class Flagpole extends MapTileObject {
 
     @Override
     public void onTrigger(Collider other) {
+        playScreen.setLevelCompleted();
     }
 }

@@ -14,6 +14,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -27,11 +29,11 @@ import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.items.*;
 import com.ychstudio.actors.maptiles.MapTileObject;
 import com.ychstudio.actors.stageitems.Flag;
-import com.ychstudio.hud.ScoreIndicator;
 import com.ychstudio.actors.weapons.Fireball;
 import com.ychstudio.actors.weapons.SpawningFireball;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.hud.Hud;
+import com.ychstudio.hud.ScoreIndicator;
 import com.ychstudio.utils.WorldContactListener;
 import com.ychstudio.utils.WorldCreator;
 
@@ -79,7 +81,7 @@ public class PlayScreen implements Screen {
     private Array<Fireball> fireballs;
     private LinkedList<SpawningFireball> fireballSpawnQueue;
 
-    private Flag flag;
+
 
     private Mario mario;
 
@@ -90,6 +92,12 @@ public class PlayScreen implements Screen {
     private boolean playMusic;
 
     private float countDown;
+
+    // TODO: levelCompleteStage
+    private Stage levelCompleteStage;
+    private boolean levelCompleted = false;
+    private boolean flagpoleMusicPlay = false;
+    private boolean levelCompletedMusicPlay = false;
 
     public PlayScreen(SuperMario game) {
         this.game = game;
@@ -125,8 +133,6 @@ public class PlayScreen implements Screen {
         enemies = worldCreator.getEnemies();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
 
-        // flag
-        flag = new Flag(this, (worldCreator.getFlagPosition().x - 9)/ GameManager.PPM, worldCreator.getFlagPosition().y / GameManager.PPM);
 
         // for spawning item
         items = new Array<Item>();
@@ -159,6 +165,16 @@ public class PlayScreen implements Screen {
         playingHurryMusic = false;
         playMusic = true;
 
+        // TODO: levelCompleteStage
+        // flag
+        Flag flag = new Flag(this, (worldCreator.getFlagPosition().x - 9)/ GameManager.PPM, worldCreator.getFlagPosition().y / GameManager.PPM);
+        MoveToAction flagSlide = new MoveToAction();
+        flagSlide.setPosition((worldCreator.getFlagPosition().x - 9) / GameManager.PPM, 3);
+        flagSlide.setDuration(1.0f);
+        flag.addAction(flagSlide);
+        levelCompleteStage = new Stage(viewport, game.batch);
+        levelCompleteStage.addActor(flag);
+
     }
 
     public TextureAtlas getTextureAtlas() {
@@ -185,6 +201,10 @@ public class PlayScreen implements Screen {
 
     public ScoreIndicator getScoreIndicator() {
         return scoreIndicator;
+    }
+
+    public void setLevelCompleted() {
+        levelCompleted = true;
     }
 
     public void addSpawnItem(float x, float y, Class<? extends Item> type) {
@@ -237,6 +257,10 @@ public class PlayScreen implements Screen {
     }
 
     public void handleInput() {
+        // TODO: test
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            levelCompleted = true;
+        }
 
         // press M to pause / play music
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
@@ -283,17 +307,29 @@ public class PlayScreen implements Screen {
         if (mario.isDead()) {
             GameManager.instance.stopMusic();
         }
+        else if (levelCompleted) {
+            if (!flagpoleMusicPlay) {
+                GameManager.instance.playMusic("flagpole.ogg", false);
+                flagpoleMusicPlay = true;
+            }
+            else if (!GameManager.instance.isPlayingMusic("flagpole.ogg")) {
+                if (!levelCompletedMusicPlay) {
+                    GameManager.instance.playMusic("stage_clear.ogg", false);
+                    levelCompletedMusicPlay = true;
+                }
+            }
+        }
         else {
             if (mario.isInvincible()) {
                 GameManager.instance.playMusic("invincible.ogg", true);
             }
             else if (hud.getTimeLeft() < 60) {
                 if (!playingHurryMusic) {
-                    GameManager.instance.playMusic("out_of_time.wav", false);
+                    GameManager.instance.playMusic("out_of_time.ogg", false);
                     playingHurryMusic = true;
                 }
                 else {
-                    if (!GameManager.instance.isPlayingMusic("out_of_time.wav")) {
+                    if (!GameManager.instance.isPlayingMusic("out_of_time.ogg")) {
                         GameManager.instance.playMusic("mario_music_hurry.ogg");
                     }
                 }
@@ -373,6 +409,12 @@ public class PlayScreen implements Screen {
 
         // update HUD
         hud.update(delta);
+
+        // TODO:
+        // update levelCompleteStage
+        if (levelCompleted) {
+            levelCompleteStage.act(delta);
+        }
 
         cleanUpDestroyedObjects();
 
@@ -460,13 +502,17 @@ public class PlayScreen implements Screen {
             fireball.draw(game.batch);
         }
 
-        // draw flag
-        flag.draw(game.batch);
-
         // draw Mario
         mario.draw(game.batch);
 
         game.batch.end();
+
+        // TODO:
+        // draw levelCompleteStage
+//        OrthographicCamera stageCamera = (OrthographicCamera)levelCompleteStage.getCamera();
+//        stageCamera.position.set(camera.position);
+        levelCompleteStage.draw();
+
 
         // draw HUD
         hud.draw();
@@ -507,5 +553,6 @@ public class PlayScreen implements Screen {
         world.dispose();
         textureAtlas.dispose();
         box2DDebugRenderer.dispose();
+        levelCompleteStage.dispose();
     }
 }
