@@ -66,6 +66,7 @@ public class GameManager implements Disposable {
         assetManager.load("audio/music/mario_music_hurry.ogg", Music.class);
         assetManager.load("audio/music/out_of_time.wav", Music.class);
         assetManager.load("audio/music/game_over.ogg", Music.class);
+        assetManager.load("audio/music/invincible.ogg", Music.class);
         assetManager.load("audio/sfx/breakblock.wav", Sound.class);
         assetManager.load("audio/sfx/bump.wav", Sound.class);
         assetManager.load("audio/sfx/coin.wav", Sound.class);

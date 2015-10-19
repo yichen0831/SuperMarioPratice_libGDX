@@ -64,6 +64,18 @@ public class Mario extends RigidBody {
     private TextureRegion brakingFireMario;
     private TextureRegion crouchingFireMario;
 
+    private TextureRegion[] standingSmallInvincible;
+    private TextureRegion[] jumpingSmallInvincible;
+    private Animation[] runningSmallInvincible;
+    private TextureRegion[] brakingSmallInvincible;
+
+    private TextureRegion[] standingBigInvincible;
+    private TextureRegion[] jumpingBigInvincible;
+    private Animation[] runningBigInvincible;
+    private TextureRegion[] brakingBigInvincible;
+    private TextureRegion[] crouchingBigInvincible;
+    private Animation[] firingBigInvincible;
+
     private TextureRegion dying;
     private Animation growing;
     private Animation fireMarioing;
@@ -86,6 +98,9 @@ public class Mario extends RigidBody {
     private boolean crouch;
     private boolean brake;
     private boolean fireMario;
+
+    private boolean isInvincible;
+    private float invincibleCountDown;
 
     private boolean smallJump = false;
     private boolean bigJump = false;
@@ -173,6 +188,87 @@ public class Mario extends RigidBody {
         crouchingBig = new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 6, 0, 16, 32);
         crouchingFireMario = new TextureRegion(textureAtlas.findRegion("FireMario"), 16 * 6, 0, 16, 32);
 
+
+        // invincible animations
+        standingSmallInvincible = new TextureRegion[4];
+        standingSmallInvincible[0] = standingSmall;
+        standingSmallInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible1"), 0, 0, 16, 16);
+        standingSmallInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible2"), 0, 0, 16, 16);
+        standingSmallInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible3"), 0, 0, 16, 16);
+
+        jumpingSmallInvincible = new TextureRegion[4];
+        jumpingSmallInvincible[0] = jumpingSmall;
+        jumpingSmallInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible1"), 16 * 5, 0, 16, 16);
+        jumpingSmallInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible2"), 16 * 5, 0, 16, 16);
+        jumpingSmallInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible3"), 16 * 5, 0, 16, 16);
+
+        brakingSmallInvincible = new TextureRegion[4];
+        brakingSmallInvincible[0] = brakingSmall;
+        brakingSmallInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible1"), 16 * 4, 0, 16, 16);
+        brakingSmallInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible2"), 16 * 4, 0, 16, 16);
+        brakingSmallInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_small_invincible3"), 16 * 4, 0, 16, 16);
+        brakingSmallInvincible[1].flip(true, false);
+        brakingSmallInvincible[2].flip(true, false);
+        brakingSmallInvincible[3].flip(true, false);
+
+        runningSmallInvincible = new Animation[4];
+        runningSmallInvincible[0] = runningSmall;
+        for (int j = 1; j < 4; j++) {
+            keyFrames.clear();
+            for (int i = 1; i < 4; i++) {
+                keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_small_invincible" + j), 16 * i, 0, 16, 16));
+            }
+            runningSmallInvincible[j] = new Animation(0.1f, keyFrames);
+        }
+
+        standingBigInvincible = new TextureRegion[4];
+        standingBigInvincible[0] = standingBig;
+        standingBigInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible1"), 0, 0, 16, 32);
+        standingBigInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible2"), 0, 0, 16, 32);
+        standingBigInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible3"), 0, 0, 16, 32);
+
+        jumpingBigInvincible = new TextureRegion[4];
+        jumpingBigInvincible[0] = jumpingBig;
+        jumpingBigInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible1"), 16 * 5, 0, 16, 32);
+        jumpingBigInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible2"), 16 * 5, 0, 16, 32);
+        jumpingBigInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible3"), 16 * 5, 0, 16, 32);
+
+        brakingBigInvincible = new TextureRegion[4];
+        brakingBigInvincible[0] = brakingBig;
+        brakingBigInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible1"), 16 * 4, 0, 16, 32);
+        brakingBigInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible2"), 16 * 4, 0, 16, 32);
+        brakingBigInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible3"), 16 * 4, 0, 16, 32);
+        brakingBigInvincible[1].flip(true, false);
+        brakingBigInvincible[2].flip(true, false);
+        brakingBigInvincible[3].flip(true, false);
+
+        crouchingBigInvincible = new TextureRegion[4];
+        crouchingBigInvincible[0] = crouchingBig;
+        crouchingBigInvincible[1] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible1"), 16 * 6, 0, 16, 32);
+        crouchingBigInvincible[2] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible2"), 16 * 6, 0, 16, 32);
+        crouchingBigInvincible[3] = new TextureRegion(textureAtlas.findRegion("Mario_big_invincible3"), 16 * 6, 0, 16, 32);
+
+        runningBigInvincible = new Animation[4];
+        runningBigInvincible[0] = runningBig;
+        for (int j = 1; j < 4; j++) {
+            keyFrames.clear();
+            for (int i = 1; i < 4; i++) {
+                keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big_invincible" + j), 16 * i, 0, 16, 32));
+            }
+            runningBigInvincible[j] = new Animation(0.1f, keyFrames);
+        }
+
+        firingBigInvincible = new Animation[4];
+        firingBigInvincible[0] = firingAnimation;
+        for (int j = 1; j < 4; j++) {
+            keyFrames.clear();
+            for (int i = 16; i < 19; i++) {
+                keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big_invincible" + j), 16 * i, 0, 16, 32));
+            }
+            firingBigInvincible[j] = new Animation(0.1f, keyFrames);
+        }
+
+
         setRegion(standingSmall);
         setBounds(getX(), getY(), 16 / GameManager.PPM, 16 / GameManager.PPM);
 
@@ -187,6 +283,10 @@ public class Mario extends RigidBody {
         shrink = false;
         growUp = false;
         crouch = false;
+
+        isInvincible = false;
+        invincibleCountDown = 0;
+
 
         showFiringAnimation = false;
 
@@ -416,6 +516,10 @@ public class Mario extends RigidBody {
         return isGrownUp || isFireMario;
     }
 
+    public boolean isInvincible() {
+        return isInvincible;
+    }
+
     public boolean isDead() {
         return isDead;
     }
@@ -459,6 +563,13 @@ public class Mario extends RigidBody {
 
         jumpSoundTimer += delta;
         fireTimer += delta;
+
+        if (isInvincible) {
+            invincibleCountDown -= delta;
+            if (invincibleCountDown <= 0) {
+                isInvincible = false;
+            }
+        }
 
         if (fireTimer > 0.1f) {
             showFiringAnimation = false;
@@ -568,7 +679,10 @@ public class Mario extends RigidBody {
                 break;
 
             case CROUCHING:
-                if (isFireMario) {
+                if (isInvincible) {
+                    setRegion(crouchingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                }
+                else if (isFireMario) {
                     setRegion(crouchingFireMario);
                 }
                 else {
@@ -594,7 +708,15 @@ public class Mario extends RigidBody {
 
             case RUNNING:
                 if (isGrownUp) {
-                    if (isFireMario) {
+                    if (isInvincible) {
+                        if (showFiringAnimation) {
+                            setRegion(firingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4].getKeyFrame(stateTime, true));
+                        }
+                        else {
+                            setRegion(runningBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4].getKeyFrame(stateTime, true));
+                        }
+                    }
+                    else if (isFireMario) {
                         if (showFiringAnimation) {
                             setRegion(firingAnimation.getKeyFrame(stateTime, true));
                         }
@@ -607,13 +729,26 @@ public class Mario extends RigidBody {
                     }
                 }
                 else {
-                    setRegion(runningSmall.getKeyFrame(stateTime, true));
+                    if (isInvincible) {
+                        setRegion(runningSmallInvincible[(int)(invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4].getKeyFrame(stateTime, true));
+                    }
+                    else {
+                        setRegion(runningSmall.getKeyFrame(stateTime, true));
+                    }
                 }
                 break;
 
             case BRAKING:
                 if (isGrownUp) {
-                    if (isFireMario) {
+                    if (isInvincible) {
+                        if (showFiringAnimation) {
+                            setRegion(firingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4].getKeyFrame(0, true));
+                        }
+                        else {
+                            setRegion(brakingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                        }
+                    }
+                    else if (isFireMario) {
                         if (showFiringAnimation) {
                             setRegion(firingAnimation.getKeyFrame(0, true));
                         }
@@ -626,13 +761,26 @@ public class Mario extends RigidBody {
                     }
                 }
                 else {
-                    setRegion(brakingSmall);
+                    if (isInvincible) {
+                        setRegion(brakingSmallInvincible[(int)(invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                    }
+                    else {
+                        setRegion(brakingSmall);
+                    }
                 }
                 break;
 
             case JUMPING:
                 if (isGrownUp) {
-                    if (isFireMario) {
+                    if (isInvincible) {
+                        if (showFiringAnimation) {
+                            setRegion(firingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4].getKeyFrame(0, true));
+                        }
+                        else {
+                            setRegion(jumpingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                        }
+                    }
+                    else if (isFireMario) {
                         if (showFiringAnimation) {
                             setRegion(firingAnimation.getKeyFrame(0, true));
                         }
@@ -645,7 +793,11 @@ public class Mario extends RigidBody {
                     }
                 }
                 else {
-                    setRegion(jumpingSmall);
+                    if (isInvincible) {
+                        setRegion(jumpingSmallInvincible[(int)(invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                    } else {
+                        setRegion(jumpingSmall);
+                    }
                 }
                 break;
 
@@ -653,7 +805,15 @@ public class Mario extends RigidBody {
             case STANDING:
             default:
                 if (isGrownUp) {
-                    if (isFireMario) {
+                    if (isInvincible) {
+                        if (showFiringAnimation) {
+                            setRegion(firingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4].getKeyFrame(0, true));
+                        }
+                        else {
+                            setRegion(standingBigInvincible[(int) (invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                        }
+                    }
+                    else if (isFireMario) {
                         if (showFiringAnimation) {
                             setRegion(firingAnimation.getKeyFrame(0, true));
                         }
@@ -666,7 +826,12 @@ public class Mario extends RigidBody {
                     }
                 }
                 else {
-                    setRegion(standingSmall);
+                    if (isInvincible) {
+                        setRegion(standingSmallInvincible[(int)(invincibleCountDown * (invincibleCountDown < 4 ? 4 : 10)) % 4]);
+                    }
+                    else {
+                        setRegion(standingSmall);
+                    }
                 }
                 break;
         }
@@ -698,28 +863,43 @@ public class Mario extends RigidBody {
     @Override
     public void onCollide(Collider other) {
         if (other.getFilter().categoryBits == GameManager.ENEMY_WEAKNESS_BIT) {
-            ((Enemy) other.getUserData()).getDamage(1);
-            float force = body.getMass() * (8.0f - body.getLinearVelocity().y);
-            body.applyLinearImpulse(new Vector2(0.0f, force), body.getWorldCenter(), true);
-        }
-        else if (other.getFilter().categoryBits == GameManager.ENEMY_LETHAL_BIT) {
-            // temporarily invincible when shrinking
-            if (shrink) {
-                return;
-            }
-
-            if (!isGrownUp) {
-                die = true;
+            if (isInvincible) {
+                ((Enemy) other.getUserData()).getDamage(3);
             }
             else {
-                assetManager.get("audio/sfx/powerdown.wav", Sound.class).play();
-                shrink = true;
+                ((Enemy) other.getUserData()).getDamage(1);
+                float force = body.getMass() * (8.0f - body.getLinearVelocity().y);
+                body.applyLinearImpulse(new Vector2(0.0f, force), body.getWorldCenter(), true);
+            }
+        }
+        else if (other.getFilter().categoryBits == GameManager.ENEMY_LETHAL_BIT) {
+            if (isInvincible) {
+                ((Enemy) other.getUserData()).getDamage(3);
+            }
+            else {
+
+                // temporarily invincible when shrinking
+                if (shrink) {
+                    return;
+                }
+
+                if (!isGrownUp) {
+                    die = true;
+                } else {
+                    assetManager.get("audio/sfx/powerdown.wav", Sound.class).play();
+                    shrink = true;
+                }
             }
         }
         else if (other.getFilter().categoryBits == GameManager.ENEMY_INTERACT_BIT) {
-            ((Enemy) other.getUserData()).interact(this);
-            float force = body.getMass() * (8.0f - body.getLinearVelocity().y);
-            body.applyLinearImpulse(new Vector2(0.0f, force), body.getWorldCenter(), true);
+            if (isInvincible) {
+                ((Enemy) other.getUserData()).getDamage(3);
+            }
+            else {
+                ((Enemy) other.getUserData()).interact(this);
+                float force = body.getMass() * (8.0f - body.getLinearVelocity().y);
+                body.applyLinearImpulse(new Vector2(0.0f, force), body.getWorldCenter(), true);
+            }
         }
         else if (other.getFilter().categoryBits == GameManager.ITEM_BIT) {
             Item item = (Item) other.getUserData();
@@ -743,6 +923,10 @@ public class Mario extends RigidBody {
                     assetManager.get("audio/sfx/stomp.wav", Sound.class).play();
 
                 }
+            }
+            else if (item.getName().equals("star")) {
+                isInvincible = true;
+                invincibleCountDown = 10.0f;
             }
 
         }

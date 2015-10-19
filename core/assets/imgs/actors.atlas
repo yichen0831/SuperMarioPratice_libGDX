@@ -5,28 +5,70 @@ filter: Nearest,Nearest
 repeat: none
 FireMario
   rotate: false
-  xy: 1, 19
+  xy: 1, 87
+  size: 336, 32
+  orig: 336, 32
+  offset: 0, 0
+  index: -1
+Mario_big_invincible1
+  rotate: false
+  xy: 1, 53
   size: 336, 32
   orig: 336, 32
   offset: 0, 0
   index: -1
 Mario_big
   rotate: false
-  xy: 339, 19
+  xy: 339, 87
   size: 336, 32
   orig: 336, 32
   offset: 0, 0
   index: -1
-Mario_small
+Mario_big_invincible3
+  rotate: false
+  xy: 1, 19
+  size: 336, 32
+  orig: 336, 32
+  offset: 0, 0
+  index: -1
+Mario_big_invincible2
+  rotate: false
+  xy: 339, 53
+  size: 336, 32
+  orig: 336, 32
+  offset: 0, 0
+  index: -1
+Mario_small_invincible2
+  rotate: false
+  xy: 677, 103
+  size: 224, 16
+  orig: 224, 16
+  offset: 0, 0
+  index: -1
+Mario_small_invincible1
   rotate: false
   xy: 1, 1
   size: 224, 16
   orig: 224, 16
   offset: 0, 0
   index: -1
+Mario_small
+  rotate: false
+  xy: 339, 35
+  size: 224, 16
+  orig: 224, 16
+  offset: 0, 0
+  index: -1
+Mario_small_invincible3
+  rotate: false
+  xy: 677, 85
+  size: 224, 16
+  orig: 224, 16
+  offset: 0, 0
+  index: -1
 Koopa
   rotate: false
-  xy: 677, 19
+  xy: 903, 87
   size: 96, 32
   orig: 96, 32
   offset: 0, 0
@@ -40,56 +82,56 @@ Coin
   index: -1
 Star
   rotate: false
-  xy: 775, 35
+  xy: 565, 35
   size: 64, 16
   orig: 64, 16
   offset: 0, 0
   index: -1
 FlippingCoin
   rotate: false
-  xy: 293, 1
+  xy: 677, 67
   size: 64, 16
   orig: 64, 16
   offset: 0, 0
   index: -1
 Flower
   rotate: false
-  xy: 841, 35
+  xy: 743, 67
   size: 64, 16
   orig: 64, 16
   offset: 0, 0
   index: -1
 Goomba
   rotate: false
-  xy: 359, 1
+  xy: 809, 67
   size: 48, 16
   orig: 48, 16
   offset: 0, 0
   index: -1
 Debris
   rotate: false
-  xy: 907, 35
+  xy: 339, 17
   size: 48, 16
   orig: 48, 16
   offset: 0, 0
   index: -1
 FireBall
   rotate: false
-  xy: 409, 1
+  xy: 631, 35
   size: 32, 16
   orig: 32, 16
   offset: 0, 0
   index: -1
 Mushroom
   rotate: false
-  xy: 957, 35
+  xy: 1001, 103
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
 Flag
   rotate: false
-  xy: 443, 1
+  xy: 859, 67
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

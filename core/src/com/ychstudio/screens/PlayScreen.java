@@ -24,10 +24,7 @@ import com.ychstudio.actors.effects.Effect;
 import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.effects.SpawningEffect;
 import com.ychstudio.actors.enemies.Enemy;
-import com.ychstudio.actors.items.Flower;
-import com.ychstudio.actors.items.Item;
-import com.ychstudio.actors.items.Mushroom;
-import com.ychstudio.actors.items.SpawningItem;
+import com.ychstudio.actors.items.*;
 import com.ychstudio.actors.maptiles.MapTileObject;
 import com.ychstudio.actors.stageitems.Flag;
 import com.ychstudio.hud.ScoreIndicator;
@@ -204,6 +201,9 @@ public class PlayScreen implements Screen {
             else if (spawningItem.type == Flower.class) {
                 items.add(new Flower(this, spawningItem.x, spawningItem.y));
             }
+            else if (spawningItem.type == Star.class) {
+                items.add(new Star(this, spawningItem.x, spawningItem.y));
+            }
 
         }
     }
@@ -284,7 +284,10 @@ public class PlayScreen implements Screen {
             GameManager.instance.stopMusic();
         }
         else {
-            if (hud.getTimeLeft() < 60) {
+            if (mario.isInvincible()) {
+                GameManager.instance.playMusic("invincible.ogg", true);
+            }
+            else if (hud.getTimeLeft() < 60) {
                 if (!playingHurryMusic) {
                     GameManager.instance.playMusic("out_of_time.wav", false);
                     playingHurryMusic = true;

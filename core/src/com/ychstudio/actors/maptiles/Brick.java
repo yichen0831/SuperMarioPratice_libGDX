@@ -12,6 +12,7 @@ import com.ychstudio.actors.effects.BrickDebris;
 import com.ychstudio.actors.effects.FlippingCoin;
 import com.ychstudio.actors.enemies.Enemy;
 import com.ychstudio.actors.items.Mushroom;
+import com.ychstudio.actors.items.Star;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -28,6 +29,7 @@ public class Brick extends MapTileObject {
     private boolean explode;
     private boolean lethal;
 
+    private boolean star = false;
     private boolean multihit = false;
     private int hitCount = 0;
 
@@ -57,6 +59,9 @@ public class Brick extends MapTileObject {
             if (hitCount > 0) {
                 multihit = true;
             }
+        }
+        else if (mapObject.getProperties().containsKey("star")) {
+            star = true;
         }
 
         hitable = true;
@@ -188,8 +193,15 @@ public class Brick extends MapTileObject {
                     hitable = false;
                 }
             }
+            else if(star) {
+                // generate star
+                playScreen.addSpawnItem(body.getPosition().x, body.getPosition().y + 16 / GameManager.PPM, Star.class);
+                GameManager.instance.getAssetManager().get("audio/sfx/powerup_spawn.wav", Sound.class).play();
+                GameManager.instance.addScore(200);
+                playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 200);
+                hitable = false;
+            }
             else {
-
                 if (((Mario) other.getUserData()).isGrownUp()) {
                     GameManager.instance.getAssetManager().get("audio/sfx/breakblock.wav", Sound.class).play();
                     GameManager.instance.addScore(50);
