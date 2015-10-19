@@ -29,6 +29,8 @@ import com.ychstudio.actors.items.Item;
 import com.ychstudio.actors.items.Mushroom;
 import com.ychstudio.actors.items.SpawningItem;
 import com.ychstudio.actors.maptiles.MapTileObject;
+import com.ychstudio.actors.stageitems.Flag;
+import com.ychstudio.hud.ScoreIndicator;
 import com.ychstudio.actors.weapons.Fireball;
 import com.ychstudio.actors.weapons.SpawningFireball;
 import com.ychstudio.gamesys.GameManager;
@@ -54,6 +56,9 @@ public class PlayScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
 
+    private float cameraLeftLimit;
+    private float cameraRightLimit;
+
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer mapRenderer;
 
@@ -77,9 +82,12 @@ public class PlayScreen implements Screen {
     private Array<Fireball> fireballs;
     private LinkedList<SpawningFireball> fireballSpawnQueue;
 
+    private Flag flag;
+
     private Mario mario;
 
     private Hud hud;
+    private ScoreIndicator scoreIndicator;
 
     private boolean playingHurryMusic;
     private boolean playMusic;
@@ -120,6 +128,9 @@ public class PlayScreen implements Screen {
         enemies = worldCreator.getEnemies();
         mario = new Mario(this, (worldCreator.getStartPosition().x + 8) / GameManager.PPM, (worldCreator.getStartPosition().y + 8) / GameManager.PPM);
 
+        // flag
+        flag = new Flag(this, (worldCreator.getFlagPosition().x - 9)/ GameManager.PPM, worldCreator.getFlagPosition().y / GameManager.PPM);
+
         // for spawning item
         items = new Array<Item>();
         itemSpawnQuque = new LinkedList<SpawningItem>();
@@ -136,7 +147,12 @@ public class PlayScreen implements Screen {
         hud = new Hud(game.batch);
         hud.setLevel("1-1");
 
+        scoreIndicator = new ScoreIndicator(this, game.batch);
+
         accumulator = 0;
+
+        cameraLeftLimit = GameManager.V_WIDTH / 2;
+        cameraRightLimit =  mapWidth - GameManager.V_WIDTH / 2;
 
         box2DDebugRenderer = new Box2DDebugRenderer();
         renderB2DDebug = false;
@@ -168,6 +184,10 @@ public class PlayScreen implements Screen {
 
     public OrthographicCamera getCamera() {
         return camera;
+    }
+
+    public ScoreIndicator getScoreIndicator() {
+        return scoreIndicator;
     }
 
     public void addSpawnItem(float x, float y, Class<? extends Item> type) {
@@ -330,17 +350,10 @@ public class PlayScreen implements Screen {
         // update Mario
         mario.update(delta);
 
-
         // camera control
         float targetX = camera.position.x;
-        if (!mario.isDead())
-            targetX = mario.getPosition().x;
-
-        if (targetX < GameManager.V_WIDTH / 2) {
-            targetX = GameManager.V_WIDTH / 2;
-        }
-        else if (targetX > mapWidth - GameManager.V_WIDTH / 2) {
-            targetX = mapWidth - GameManager.V_WIDTH / 2;
+        if (!mario.isDead()) {
+            targetX = MathUtils.clamp(mario.getPosition().x, cameraLeftLimit, cameraRightLimit);
         }
 
         camera.position.x = MathUtils.lerp(camera.position.x, targetX, 0.1f);
@@ -351,6 +364,9 @@ public class PlayScreen implements Screen {
 
         // update map renderer
         mapRenderer.setView(camera);
+
+        // update ScoreIndicator
+        scoreIndicator.update(delta);
 
         // update HUD
         hud.update(delta);
@@ -385,13 +401,11 @@ public class PlayScreen implements Screen {
             }
         }
 
-        /*
         for (int i = 0; i < effects.size; i++) {
             if (effects.get(i).isDestroyed()) {
                 effects.removeIndex(i);
             }
         }
-        */
 
         for (int i = 0; i < fireballs.size; i++) {
             if (fireballs.get(i).isDestroyed()) {
@@ -411,6 +425,9 @@ public class PlayScreen implements Screen {
 
         // draw map
         mapRenderer.render(new int[] {0, 1});
+
+        // draw ScoreIndicator
+        scoreIndicator.draw();
 
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
@@ -440,11 +457,15 @@ public class PlayScreen implements Screen {
             fireball.draw(game.batch);
         }
 
+        // draw flag
+        flag.draw(game.batch);
+
         // draw Mario
         mario.draw(game.batch);
 
         game.batch.end();
 
+        // draw HUD
         hud.draw();
 
         if (renderB2DDebug) {
@@ -478,6 +499,7 @@ public class PlayScreen implements Screen {
     @Override
     public void dispose() {
         hud.dispose();
+        scoreIndicator.dispose();
         tiledMap.dispose();
         world.dispose();
         textureAtlas.dispose();

@@ -4,6 +4,7 @@ import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.ychstudio.actors.Collider;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -32,6 +33,7 @@ public class Flagpole extends MapTileObject {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.filter.categoryBits = GameManager.FLAGPOLE_BIT;
+        fixtureDef.filter.maskBits = GameManager.MARIO_BIT;
         fixtureDef.shape = shape;
         fixtureDef.isSensor = true;
 
@@ -39,5 +41,10 @@ public class Flagpole extends MapTileObject {
 
         shape.dispose();
 
+    }
+
+
+    @Override
+    public void onTrigger(Collider other) {
     }
 }

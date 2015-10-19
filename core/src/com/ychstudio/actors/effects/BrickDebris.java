@@ -45,8 +45,8 @@ public class BrickDebris extends Effect {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.restitution = 0.1f;
-        fixtureDef.filter.categoryBits = GameManager.GROUND_BIT;
-        fixtureDef.filter.maskBits = GameManager.GROUND_BIT;
+        fixtureDef.filter.categoryBits = GameManager.NOTHING_BIT;
+        fixtureDef.filter.maskBits = GameManager.NOTHING_BIT;
 
         body.createFixture(fixtureDef).setUserData(this);
 
@@ -57,6 +57,17 @@ public class BrickDebris extends Effect {
     public void update(float delta) {
         if (destroyed) {
             return;
+        }
+
+        if (toBeDestroyed) {
+            world.destroyBody(body);
+            body = null;
+            destroyed = true;
+            return;
+        }
+
+        if (body.getPosition().y < -2.0f) {
+            queueDestroy();
         }
 
         setPosition(body.getPosition().x - radius, body.getPosition().y - radius);

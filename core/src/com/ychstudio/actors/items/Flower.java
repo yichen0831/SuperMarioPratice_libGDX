@@ -38,6 +38,7 @@ public class Flower extends Item {
     @Override
     public void use() {
         GameManager.instance.addScore(1000);
+        playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 1000);
         queueDestroy();
     }
 

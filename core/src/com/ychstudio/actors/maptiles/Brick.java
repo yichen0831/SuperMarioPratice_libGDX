@@ -179,6 +179,7 @@ public class Brick extends MapTileObject {
                     playScreen.addSpawnEffect(body.getPosition().x, body.getPosition().y + 1.0f, FlippingCoin.class);
                     GameManager.instance.getAssetManager().get("audio/sfx/coin.wav", Sound.class).play();
                     GameManager.instance.addScore(200);
+                    playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 200);
                     hitCount--;
                     hit = true;
                     lethal = true;

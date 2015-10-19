@@ -35,7 +35,7 @@ public class Hud implements Disposable {
 
     public Hud(SpriteBatch batch) {
 
-        Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 2, GameManager.WINDOW_HEIGHT / 2, new OrthographicCamera());
+        Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 1.5f, GameManager.WINDOW_HEIGHT / 1.5f, new OrthographicCamera());
         stage = new Stage(viewport, batch);
 
         timeLeft = 300;

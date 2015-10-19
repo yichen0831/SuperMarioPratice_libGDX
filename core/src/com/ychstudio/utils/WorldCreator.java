@@ -24,6 +24,7 @@ public class WorldCreator {
     private Array<Enemy> enemies;
 
     private Vector2 startPosition;
+    private Vector2 flagPosition;
 
     public WorldCreator(PlayScreen playScreen, TiledMap tiledMap) {
 
@@ -110,6 +111,18 @@ public class WorldCreator {
             }
         }
 
+        flagPosition = new Vector2();
+
+        mapLayer = tiledMap.getLayers().get("Flag");
+        if (mapLayer != null) {
+            if (mapLayer.getObjects().getCount() > 0) {
+                float x = ((TiledMapTileMapObject) mapLayer.getObjects().get(0)).getX();
+                float y = ((TiledMapTileMapObject) mapLayer.getObjects().get(0)).getY();
+
+                flagPosition = new Vector2(x, y);
+            }
+        }
+
 
         startPosition = new Vector2(64.0f, 64.0f);
 
@@ -127,6 +140,10 @@ public class WorldCreator {
 
     public Vector2 getStartPosition() {
         return startPosition;
+    }
+
+    public Vector2 getFlagPosition() {
+        return flagPosition;
     }
 
     public Array<MapTileObject> getMapTileObject() {

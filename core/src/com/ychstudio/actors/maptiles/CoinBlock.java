@@ -143,6 +143,7 @@ public class CoinBlock extends MapTileObject {
             if (hitable) {
 
                 GameManager.instance.addScore(200);
+                playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 200);
                 hitable = false;
                 hit = true;
                 lethal = true;

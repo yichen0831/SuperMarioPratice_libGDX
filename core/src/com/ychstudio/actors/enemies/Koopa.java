@@ -174,7 +174,7 @@ public class Koopa extends Enemy {
             return;
         }
 
-        if (playScreen.getMarioPosition().x + GameManager.V_WIDTH / 2 > body.getPosition().x )
+        if (playScreen.getMarioPosition().x + GameManager.V_WIDTH / 2 + 4 > body.getPosition().x )
             active = true;
 
         if (!active) {
@@ -189,6 +189,7 @@ public class Koopa extends Enemy {
             becomeDead();
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
             GameManager.instance.addScore(500);
+            playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 500);
             currentState = State.DYING;
         }
         else if (shell) {
@@ -196,6 +197,7 @@ public class Koopa extends Enemy {
             becomeShell();
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
             GameManager.instance.addScore(500);
+            playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 500);
             currentState = State.SHELLING;
         }
         else if (spin) {
@@ -203,6 +205,7 @@ public class Koopa extends Enemy {
             becomeNoraml();
             GameManager.instance.getAssetManager().get("audio/sfx/kick.ogg", Sound.class).play();
             GameManager.instance.addScore(500);
+            playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 500);
             currentState = State.SPINNING;
         }
         else if (awake) {

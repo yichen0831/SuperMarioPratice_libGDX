@@ -103,7 +103,7 @@ public class Goomba extends Enemy {
             return;
         }
 
-        if (playScreen.getMarioPosition().x + GameManager.V_WIDTH / 2 > body.getPosition().x )
+        if (playScreen.getMarioPosition().x + GameManager.V_WIDTH / 2 + 4 > body.getPosition().x )
             active = true;
 
         if (!active) {
@@ -119,6 +119,7 @@ public class Goomba extends Enemy {
 
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play();
             GameManager.instance.addScore(100);
+            playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 100);
         }
         else if (die) {
             die = false;
@@ -134,6 +135,7 @@ public class Goomba extends Enemy {
             GameManager.instance.getAssetManager().get("audio/sfx/stomp.wav", Sound.class).play(volume, 1.0f, pan);
 
             GameManager.instance.addScore(100);
+            playScreen.getScoreIndicator().addScoreItem(getX(), getY(), 100);
         }
         else if (walk) {
             walk = false;
