@@ -8,7 +8,7 @@ Fundamental ideas are learned from [Brent Aureli](https://www.youtube.com/watch?
 
 Web play: [http://supermariolibgdx.bugs3.com/](http://supermariolibgdx.bugs3.com/)
 
-Excutable Java download: [Mega download](https://mega.nz/#!Z1QViL7K!Ob9EBAm7iyPBw-kAQy5681na4FzljuauBC0gFgt4lpw)
+Excutable Java download: [Mega download](https://mega.nz/#!JsJhyCQA!xif2fbI4gWrKHxZao8m-8faKFJ0U7qPhjXwtJjk3xWs)
 
 ##Controls:
 LEFT / RIGHT / DOWN to control Mario movements
