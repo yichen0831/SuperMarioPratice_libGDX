@@ -203,7 +203,7 @@ public class Goomba extends Enemy {
 
     @Override
     public void getDamage(int damage) {
-        if (toBeDestroyed || currentState == State.STOMPED || currentState == State.DYING) {
+        if (toBeDestroyed || currentState == State.STOMPED || currentState == State.DYING || !active) {
             return;
         }
 

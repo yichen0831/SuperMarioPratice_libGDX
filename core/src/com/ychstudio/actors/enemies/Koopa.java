@@ -122,7 +122,7 @@ public class Koopa extends Enemy {
 
     @Override
     public void getDamage(int damage) {
-        if (toBeDestroyed) {
+        if (toBeDestroyed || !active) {
             return;
         }
 
