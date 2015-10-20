@@ -180,7 +180,6 @@ public class Mario extends RigidBody {
             keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 0, 0, 16, 32));
             keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_big"), 16 * 15, 0, 16, 32));
         }
-        keyFrames.add(new TextureRegion(textureAtlas.findRegion("Mario_small"), 0, 0, 16, 32));
         shrinking = new Animation(0.1f, keyFrames);
 
         dying = new TextureRegion(textureAtlas.findRegion("Mario_small"), 16 * 6, 0, 16, 16);

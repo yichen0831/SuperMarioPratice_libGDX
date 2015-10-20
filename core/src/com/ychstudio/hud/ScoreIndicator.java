@@ -1,5 +1,6 @@
 package com.ychstudio.hud;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -33,7 +34,7 @@ public class ScoreIndicator implements Disposable {
             this.x = x;
             this.y = y;
             this.score = Integer.toString(score);
-            life = 0.5f;
+            life = 0.8f;
         }
 
         @Override
@@ -42,7 +43,7 @@ public class ScoreIndicator implements Disposable {
         }
     }
 
-    private BitmapFont font;
+    private BitmapFont font; // TODO: use TTF
     private PlayScreen playScreen;
     private SpriteBatch batch;
 
@@ -63,7 +64,7 @@ public class ScoreIndicator implements Disposable {
         camera.position.set(playScreen.getCamera().position.x * RATIO, GameManager.WINDOW_HEIGHT / 2, 0);
 
 
-        font = new BitmapFont();
+        font = new BitmapFont(Gdx.files.internal("fonts/Fixedsys500c.fnt"));
         font.getData().setScale(1.2f);
 
         scoreItemPool = new Pool<ScoreItem>() {

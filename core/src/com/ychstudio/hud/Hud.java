@@ -1,5 +1,6 @@
 package com.ychstudio.hud;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -33,24 +34,25 @@ public class Hud implements Disposable {
     private float fpsTimeAccumulator;
     private float accumulator;
 
+    private BitmapFont font;
+
     public Hud(SpriteBatch batch) {
 
-        Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 1.5f, GameManager.WINDOW_HEIGHT / 1.5f, new OrthographicCamera());
+        Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 1.8f, GameManager.WINDOW_HEIGHT / 1.8f, new OrthographicCamera());
         stage = new Stage(viewport, batch);
 
         timeLeft = 300;
 
-        Label scoreTextLabel;
-        Label timeTextLabel;
-        Label levelTextLabel;
+        font = new BitmapFont(Gdx.files.internal("fonts/Fixedsys500c.fnt"));
 
-        scoreTextLabel = new Label("SCORE", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timeTextLabel = new Label("TIME", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        levelTextLabel = new Label("LEVEL", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        // TODO: use TTF
+        Label scoreTextLabel = new Label("SCORE", new Label.LabelStyle(font, Color.WHITE));
+        Label timeTextLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
+        Label levelTextLabel = new Label("LEVEL", new Label.LabelStyle(font, Color.WHITE));
 
-        scoreLabel = new Label("", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        timeLabel = new Label(intToString(timeLeft, 3), new Label.LabelStyle(new BitmapFont(), Color.WHITE));
-        levelLabel = new Label("1-1", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        scoreLabel = new Label("", new Label.LabelStyle(font, Color.WHITE));
+        timeLabel = new Label(intToString(timeLeft, 3), new Label.LabelStyle(font, Color.WHITE));
+        levelLabel = new Label("1-1", new Label.LabelStyle(font, Color.WHITE));
 
 
         Table table = new Table();
@@ -70,7 +72,7 @@ public class Hud implements Disposable {
         table.row();
 
         // FPS
-        fpsLabel = new Label("FPS:    ", new Label.LabelStyle(new BitmapFont(), Color.WHITE));
+        fpsLabel = new Label("FPS:    ", new Label.LabelStyle(font, Color.WHITE));
         Table fpsTable = new Table();
         fpsTable.add(fpsLabel);
         table.add(fpsTable).expand().bottom();
@@ -141,6 +143,7 @@ public class Hud implements Disposable {
 
     @Override
     public void dispose() {
+        font.dispose();
         stage.dispose();
     }
 }
