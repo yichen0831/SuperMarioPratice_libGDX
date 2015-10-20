@@ -1,6 +1,8 @@
 #SuperMarioPractice
 
-Use [libGDX](https://libgdx.badlogicgames.com/) to create SuperMario game
+![screenshot](https://github.com/yichen0831/SuperMarioPratice_libGDX/raw/master/screenshot.png)
+
+SuperMario game Level 1-1 made with [libGDX](https://libgdx.badlogicgames.com/)
 
 Fundamental ideas are learned from [Brent Aureli](https://www.youtube.com/watch?v=a8MPxzkwBwo)
 
