@@ -6,6 +6,10 @@ SuperMario game Level 1-1 made with [libGDX](https://libgdx.badlogicgames.com/)
 
 Fundamental ideas are learned from [Brent Aureli](https://www.youtube.com/watch?v=a8MPxzkwBwo)
 
+Web play: [http://supermariolibgdx.bugs3.com/](http://supermariolibgdx.bugs3.com/)
+
+Excutable Java download: [Mega download](https://mega.nz/#!Z1QViL7K!Ob9EBAm7iyPBw-kAQy5681na4FzljuauBC0gFgt4lpw)
+
 ##Controls:
 LEFT / RIGHT / DOWN to control Mario movements
 
