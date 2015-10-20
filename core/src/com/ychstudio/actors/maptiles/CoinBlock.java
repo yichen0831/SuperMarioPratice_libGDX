@@ -162,6 +162,7 @@ public class CoinBlock extends MapTileObject {
                 else {
                     playScreen.addSpawnEffect(body.getPosition().x, body.getPosition().y + 1.0f, FlippingCoin.class);
                     GameManager.instance.getAssetManager().get("audio/sfx/coin.wav", Sound.class).play();
+                    GameManager.instance.addCoin();
                 }
             }
             else {

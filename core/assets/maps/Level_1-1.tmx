@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="212" height="15" tilewidth="16" tileheight="16" nextobjectid="645">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="212" height="15" tilewidth="16" tileheight="16" nextobjectid="647">
  <tileset firstgid="1" name="tileset_gutter" tilewidth="16" tileheight="16" spacing="2" margin="1" tilecount="924">
   <image source="tileset_gutter.png" width="594" height="504"/>
  </tileset>
@@ -630,6 +630,8 @@
   <object id="599" gid="314" x="3136" y="160" width="16" height="16"/>
   <object id="600" gid="314" x="3136" y="176" width="16" height="16"/>
   <object id="601" gid="314" x="3136" y="192" width="16" height="16"/>
+  <object id="645" gid="29" x="3136" y="16" width="16" height="16"/>
+  <object id="646" gid="29" x="3136" y="32" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Flag">
   <object id="624" gid="61" x="3136" y="64" width="16" height="16"/>

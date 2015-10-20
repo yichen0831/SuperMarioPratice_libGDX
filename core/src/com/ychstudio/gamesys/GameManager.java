@@ -45,8 +45,9 @@ public class GameManager implements Disposable {
     private AssetManager assetManager;
 
     private int score;
-    public static float timeScale = 1;
+    private int coins;
 
+    public static float timeScale = 1;
 
     public GameManager() {
         if (instance == null) {
@@ -60,6 +61,7 @@ public class GameManager implements Disposable {
         loadAudio();
 
         score = 0;
+        coins = 0;
     }
 
     private void loadAudio() {
@@ -100,6 +102,18 @@ public class GameManager implements Disposable {
 
     public void addScore(int value) {
         score += value;
+    }
+
+    public void addCoin() {
+        addCoin(1);
+    }
+
+    public void addCoin(int value) {
+        coins += value;
+    }
+
+    public int getCoins() {
+        return coins;
     }
 
     public static void setTimeScale(float value) {

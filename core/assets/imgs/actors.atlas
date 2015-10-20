@@ -122,6 +122,13 @@ FireBall
   orig: 32, 16
   offset: 0, 0
   index: -1
+CoinHUD
+  rotate: false
+  xy: 677, 57
+  size: 24, 8
+  orig: 24, 8
+  offset: 0, 0
+  index: -1
 Mushroom
   rotate: false
   xy: 1001, 103

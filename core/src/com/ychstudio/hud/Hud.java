@@ -3,11 +3,12 @@ package com.ychstudio.hud;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -20,6 +21,41 @@ import com.ychstudio.gamesys.GameManager;
  */
 public class Hud implements Disposable {
 
+    class CoinHUD extends Actor {
+
+        private Animation anim;
+        private float stateTime;
+
+        public CoinHUD(TextureAtlas textureAtlas) {
+
+            Array<TextureRegion> keyFrames = new Array<TextureRegion>();
+            for (int i = 0; i < 3; i++) {
+                keyFrames.add(new TextureRegion(textureAtlas.findRegion("CoinHUD"), i * 8, 0, 8, 8));
+            }
+            anim = new Animation(0.3f, keyFrames);
+
+            setSize(16, 16);
+            stateTime = 0;
+        }
+
+        @Override
+        protected void positionChanged() {
+            super.positionChanged();
+
+        }
+
+        @Override
+        public void draw(Batch batch, float parentAlpha) {
+            batch.draw(anim.getKeyFrame(stateTime, true), getX(), getY());
+        }
+
+        @Override
+        public void act(float delta) {
+            stateTime += delta;
+        }
+    }
+
+
     private Stage stage;
 
     private int timeLeft;
@@ -27,6 +63,8 @@ public class Hud implements Disposable {
     private Label scoreLabel;
     private Label timeLabel;
     private Label levelLabel;
+
+    private Label coinCountLabel;
 
     private boolean showFPS;
     private Label fpsLabel;
@@ -36,23 +74,28 @@ public class Hud implements Disposable {
 
     private BitmapFont font;
 
+    private TextureAtlas textureAtlas;
+
     public Hud(SpriteBatch batch) {
 
-        Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 1.8f, GameManager.WINDOW_HEIGHT / 1.8f, new OrthographicCamera());
+        Viewport viewport = new FitViewport(GameManager.WINDOW_WIDTH / 1.5f, GameManager.WINDOW_HEIGHT / 1.5f, new OrthographicCamera());
         stage = new Stage(viewport, batch);
 
         timeLeft = 300;
 
         font = new BitmapFont(Gdx.files.internal("fonts/Fixedsys500c.fnt"));
+        Label.LabelStyle style = new Label.LabelStyle(font, Color.WHITE);
 
-        // TODO: use TTF
-        Label scoreTextLabel = new Label("SCORE", new Label.LabelStyle(font, Color.WHITE));
-        Label timeTextLabel = new Label("TIME", new Label.LabelStyle(font, Color.WHITE));
-        Label levelTextLabel = new Label("LEVEL", new Label.LabelStyle(font, Color.WHITE));
+        Label scoreTextLabel = new Label("SCORE", style);
+        Label timeTextLabel = new Label("TIME", style);
+        Label levelTextLabel = new Label("WORLD", style);
 
-        scoreLabel = new Label("", new Label.LabelStyle(font, Color.WHITE));
-        timeLabel = new Label(intToString(timeLeft, 3), new Label.LabelStyle(font, Color.WHITE));
-        levelLabel = new Label("1-1", new Label.LabelStyle(font, Color.WHITE));
+        scoreLabel = new Label("", style);
+        timeLabel = new Label(intToString(timeLeft, 3), style);
+        levelLabel = new Label("1-1", style);
+
+        textureAtlas = new TextureAtlas("imgs/actors.atlas");
+        CoinHUD coin = new CoinHUD(textureAtlas);
 
 
         Table table = new Table();
@@ -60,19 +103,28 @@ public class Hud implements Disposable {
         table.setFillParent(true);
 
         table.add(scoreTextLabel).expandX().padTop(6.0f);
+        table.add();
         table.add(levelTextLabel).expandX().padTop(6.0f);
         table.add(timeTextLabel).expandX().padTop(6.0f);
 
         table.row();
 
         table.add(scoreLabel).expandX();
+
+        // coin count
+        Table table1 = new Table();
+        coinCountLabel = new Label("x00", style);
+        table1.add(coin);
+        table1.add(coinCountLabel);
+        table.add(table1).expandX();
+
         table.add(levelLabel).expandX();
         table.add(timeLabel).expandX();
 
         table.row();
 
         // FPS
-        fpsLabel = new Label("FPS:    ", new Label.LabelStyle(font, Color.WHITE));
+        fpsLabel = new Label("FPS:    ", style);
         Table fpsTable = new Table();
         fpsTable.add(fpsLabel);
         table.add(fpsTable).expand().bottom();
@@ -126,6 +178,9 @@ public class Hud implements Disposable {
             timeLabel.setText(intToString(timeLeft, 3));
         }
 
+        coinCountLabel.setText("x" + intToString(GameManager.instance.getCoins(), 2));
+
+        stage.act(delta);
 
     }
 
@@ -145,5 +200,6 @@ public class Hud implements Disposable {
     public void dispose() {
         font.dispose();
         stage.dispose();
+        textureAtlas.dispose();
     }
 }

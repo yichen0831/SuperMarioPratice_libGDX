@@ -5,6 +5,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.ychstudio.actors.Collider;
+import com.ychstudio.actors.Mario;
 import com.ychstudio.gamesys.GameManager;
 import com.ychstudio.screens.PlayScreen;
 
@@ -46,6 +47,10 @@ public class Flagpole extends MapTileObject {
 
     @Override
     public void onTrigger(Collider other) {
-        playScreen.setLevelCompleted();
+        if (other.getUserData() instanceof Mario) {
+            playScreen.levelCompleted();
+            ((Mario) other.getUserData()).levelCompleted();
+        }
+
     }
 }

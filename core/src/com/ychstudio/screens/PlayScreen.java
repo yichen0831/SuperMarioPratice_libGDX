@@ -15,7 +15,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
+import com.badlogic.gdx.scenes.scene2d.actions.RunnableAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -81,8 +84,6 @@ public class PlayScreen implements Screen {
     private Array<Fireball> fireballs;
     private LinkedList<SpawningFireball> fireballSpawnQueue;
 
-
-
     private Mario mario;
 
     private Hud hud;
@@ -93,8 +94,7 @@ public class PlayScreen implements Screen {
 
     private float countDown;
 
-    // TODO: levelCompleteStage
-    private Stage levelCompleteStage;
+    private Stage levelCompletedStage;
     private boolean levelCompleted = false;
     private boolean flagpoleMusicPlay = false;
     private boolean levelCompletedMusicPlay = false;
@@ -165,15 +165,23 @@ public class PlayScreen implements Screen {
         playingHurryMusic = false;
         playMusic = true;
 
-        // TODO: levelCompleteStage
-        // flag
+        // flag and levelCompletedStage
         Flag flag = new Flag(this, (worldCreator.getFlagPosition().x - 9)/ GameManager.PPM, worldCreator.getFlagPosition().y / GameManager.PPM);
         MoveToAction flagSlide = new MoveToAction();
         flagSlide.setPosition((worldCreator.getFlagPosition().x - 9) / GameManager.PPM, 3);
         flagSlide.setDuration(1.0f);
         flag.addAction(flagSlide);
-        levelCompleteStage = new Stage(viewport, game.batch);
-        levelCompleteStage.addActor(flag);
+        levelCompletedStage = new Stage(viewport, game.batch);
+        levelCompletedStage.addActor(flag);
+        RunnableAction setLevelCompletedScreen = new RunnableAction();
+        setLevelCompletedScreen.setRunnable(new Runnable() {
+            @Override
+            public void run() {
+                game.setScreen(new GameOverScreen(game));
+                dispose();
+            }
+        });
+        levelCompletedStage.addAction(new SequenceAction(new DelayAction(8.0f), setLevelCompletedScreen));
 
     }
 
@@ -203,7 +211,10 @@ public class PlayScreen implements Screen {
         return scoreIndicator;
     }
 
-    public void setLevelCompleted() {
+    public void levelCompleted() {
+        if (levelCompleted) {
+            return;
+        }
         levelCompleted = true;
     }
 
@@ -257,10 +268,6 @@ public class PlayScreen implements Screen {
     }
 
     public void handleInput() {
-        // TODO: test
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-            levelCompleted = true;
-        }
 
         // press M to pause / play music
         if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
@@ -410,10 +417,9 @@ public class PlayScreen implements Screen {
         // update HUD
         hud.update(delta);
 
-        // TODO:
-        // update levelCompleteStage
+        // update levelCompletedStage
         if (levelCompleted) {
-            levelCompleteStage.act(delta);
+            levelCompletedStage.act(delta);
         }
 
         cleanUpDestroyedObjects();
@@ -507,11 +513,8 @@ public class PlayScreen implements Screen {
 
         game.batch.end();
 
-        // TODO:
-        // draw levelCompleteStage
-//        OrthographicCamera stageCamera = (OrthographicCamera)levelCompleteStage.getCamera();
-//        stageCamera.position.set(camera.position);
-        levelCompleteStage.draw();
+        // draw levelCompletedStage
+        levelCompletedStage.draw();
 
 
         // draw HUD
@@ -553,6 +556,6 @@ public class PlayScreen implements Screen {
         world.dispose();
         textureAtlas.dispose();
         box2DDebugRenderer.dispose();
-        levelCompleteStage.dispose();
+        levelCompletedStage.dispose();
     }
 }
