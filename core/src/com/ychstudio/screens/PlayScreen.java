@@ -76,7 +76,7 @@ public class PlayScreen implements Screen {
     private Array<Enemy> enemies;
 
     private Array<Item> items;
-    private LinkedList<SpawningItem> itemSpawnQuque;
+    private LinkedList<SpawningItem> itemSpawnQueue;
 
     private Array<Effect> effects;
     private LinkedList<SpawningEffect> effectSpawnQueue;
@@ -136,7 +136,7 @@ public class PlayScreen implements Screen {
 
         // for spawning item
         items = new Array<Item>();
-        itemSpawnQuque = new LinkedList<SpawningItem>();
+        itemSpawnQueue = new LinkedList<SpawningItem>();
 
         // for spawning effect
         effects = new Array<Effect>();
@@ -219,12 +219,12 @@ public class PlayScreen implements Screen {
     }
 
     public void addSpawnItem(float x, float y, Class<? extends Item> type) {
-        itemSpawnQuque.add(new SpawningItem(x, y, type));
+        itemSpawnQueue.add(new SpawningItem(x, y, type));
     }
 
     private void handleSpawningItem() {
-        if (itemSpawnQuque.size() > 0) {
-            SpawningItem spawningItem = itemSpawnQuque.poll();
+        if (itemSpawnQueue.size() > 0) {
+            SpawningItem spawningItem = itemSpawnQueue.poll();
 
             if (spawningItem.type == Mushroom.class) {
                 items.add(new Mushroom(this, spawningItem.x, spawningItem.y));
