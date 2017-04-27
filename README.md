@@ -6,7 +6,7 @@ SuperMario game Level 1-1 made with [libGDX](https://libgdx.badlogicgames.com/)
 
 Fundamental ideas are learned from [Brent Aureli](https://www.youtube.com/watch?v=a8MPxzkwBwo)
 
-Web play: [http://supermariolibgdx.bugs3.com/](http://supermariolibgdx.bugs3.com/)
+~Web play: [http://supermariolibgdx.bugs3.com/](http://supermariolibgdx.bugs3.com/)~
 
 Excutable Java download: [Mega download](https://mega.nz/#!JsJhyCQA!xif2fbI4gWrKHxZao8m-8faKFJ0U7qPhjXwtJjk3xWs)
 
